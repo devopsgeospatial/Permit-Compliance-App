@@ -3,362 +3,288 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Building Permit Compliance</title>
+<title>NLA · Urban Change Detection Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:   #0b1a2b;
-  --bg1:  #0f2236;
-  --bg2:  #132a42;
-  --bg3:  #1a3350;
-  --bd:   #1e3a54;
-  --bd2:  #254460;
-  --ink:  #e0f0ff;
-  --ink2: #9dc4e0;
-  --ink3: #5a8aaa;
-  --teal: #00d4b8;
-  --sky:  #48b4f0;
-  --rose: #f06080;
-  --gold: #f0c060;
-  --lime: #78d890;
-  --violet: #a080f0;
-  --mono: 'JetBrains Mono','Fira Mono','Courier New',monospace;
-  --sans: 'Inter','Segoe UI',system-ui,sans-serif;
+  --bg:    #0b1a2b;
+  --bg1:   #0f2236;
+  --bg2:   #132a42;
+  --bg3:   #1a3350;
+  --bd:    #1e3a54;
+  --bd2:   #254460;
+  --ink:   #e0f0ff;
+  --ink2:  #9dc4e0;
+  --ink3:  #5a8aaa;
+  --teal:  #00d4b8;
+  --sky:   #48b4f0;
+  --rose:  #f06080;
+  --gold:  #f0c060;
+  --lime:  #78d890;
+  --violet:#a080f0;
+  --mono:  'JetBrains Mono','Fira Mono','Courier New',monospace;
+  --sans:  'Inter','Segoe UI',system-ui,sans-serif;
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 13px; overflow-x: hidden; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;overflow-x:hidden}
 
 /* ── MASTHEAD ── */
-.masthead {
-  background: linear-gradient(180deg, #071523 0%, #0b1a2b 100%);
-  border-bottom: 1px solid var(--bd2);
-  padding: 0 32px;
-  height: 58px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  gap: 32px;
-}
-.mh-title { font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: .2px; }
-.mh-title span { color: var(--teal); }
-.mh-sub { font-family: var(--mono); font-size: 8px; color: var(--ink3); letter-spacing: 1.5px; margin-top: 2px; }
+.masthead{background:linear-gradient(180deg,#071523 0%,var(--bg) 100%);border-bottom:1px solid var(--bd2);padding:0 32px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300;gap:32px}
+.mh-left{}
+.mh-title{font-size:15px;font-weight:600;color:var(--ink);letter-spacing:.2px}
+.mh-title span{color:var(--teal)}
+.mh-sub{font-family:var(--mono);font-size:8px;color:var(--ink3);letter-spacing:1.5px;margin-top:2px}
+.gkpi-row{display:flex;gap:1px;margin-left:auto;height:58px}
+.gkpi{padding:0 22px;display:flex;flex-direction:column;justify-content:center;border-left:1px solid var(--bd);min-width:130px}
+.gkpi-lbl{font-family:var(--mono);font-size:7px;letter-spacing:2px;color:var(--ink3);text-transform:uppercase;margin-bottom:5px}
+.gkpi-val{font-family:var(--mono);font-size:20px;font-weight:700;line-height:1}
+.gkpi-sub{font-family:var(--mono);font-size:7px;color:var(--ink3);margin-top:3px}
 
-/* ── GLOBAL KPI STRIP ── */
-.gkpi-row { display: flex; gap: 1px; margin-left: auto; height: 58px; }
-.gkpi {
-  padding: 0 22px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-left: 1px solid var(--bd);
-  min-width: 130px;
-}
-.gkpi-lbl { font-family: var(--mono); font-size: 7px; letter-spacing: 2px; color: var(--ink3); text-transform: uppercase; margin-bottom: 5px; }
-.gkpi-val { font-family: var(--mono); font-size: 20px; font-weight: 700; line-height: 1; }
-.gkpi-sub { font-family: var(--mono); font-size: 7px; color: var(--ink3); margin-top: 3px; }
+/* ── FILTER BAR ── */
+.filter-bar{background:var(--bg1);border-bottom:1px solid var(--bd);padding:0 32px;height:46px;display:flex;align-items:center;gap:12px;position:sticky;top:58px;z-index:290;overflow-x:auto;scrollbar-width:none}
+.filter-bar::-webkit-scrollbar{display:none}
+.filter-lbl{font-family:var(--mono);font-size:7px;letter-spacing:2px;color:var(--ink3);text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.filter-sep{width:1px;height:20px;background:var(--bd);flex-shrink:0}
+.fsel-wrap{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.fsel-name{font-family:var(--mono);font-size:7px;letter-spacing:1.5px;color:var(--ink3);white-space:nowrap}
+.fsel{background:var(--bg2);border:1px solid var(--bd2);color:var(--ink2);font-family:var(--mono);font-size:8px;padding:4px 24px 4px 8px;border-radius:2px;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%235a8aaa'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;min-width:110px}
+.fsel:focus{outline:1px solid var(--teal)}
+.filter-reset{font-family:var(--mono);font-size:7px;letter-spacing:1.5px;color:var(--rose);border:1px solid var(--bd2);background:transparent;padding:4px 10px;border-radius:2px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.filter-reset:hover{border-color:var(--rose)}
+.filter-count{font-family:var(--mono);font-size:7px;color:var(--ink3);margin-left:auto;white-space:nowrap;flex-shrink:0}
 
 /* ── STATUS BAR ── */
-.sbar {
-  background: var(--bg1);
-  border-bottom: 1px solid var(--bd);
-  padding: 0 32px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--mono);
-  font-size: 8px;
-  color: var(--ink3);
-  letter-spacing: 1.5px;
-  transition: height .2s, opacity .2s;
-}
-.sbar.gone { height: 0; opacity: 0; pointer-events: none; overflow: hidden; padding: 0; border: none; }
-.sdot { width: 5px; height: 5px; border-radius: 50%; background: var(--teal); flex-shrink: 0; animation: pulse 1.2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.2} }
+.sbar{background:var(--bg2);border-bottom:1px solid var(--bd);padding:0 32px;height:24px;display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:8px;color:var(--ink3);letter-spacing:1.5px;transition:height .2s,opacity .2s}
+.sbar.gone{height:0;opacity:0;pointer-events:none;overflow:hidden;padding:0;border:none}
+.sdot{width:5px;height:5px;border-radius:50%;background:var(--teal);flex-shrink:0;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
 
-/* ── TAB BAR ── */
-.tab-bar {
-  background: var(--bg1);
-  border-bottom: 1px solid var(--bd);
-  padding: 0 32px;
-  display: flex;
-  overflow-x: auto;
-  scrollbar-width: none;
-  position: sticky;
-  top: 58px;
-  z-index: 190;
-}
-.tab-bar::-webkit-scrollbar { display: none; }
-.tab {
-  padding: 0 18px;
-  height: 40px;
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--ink3);
-  cursor: pointer;
-  border: none;
-  background: none;
-  border-bottom: 2px solid transparent;
-  white-space: nowrap;
-  transition: color .15s, border-color .15s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.tab:hover { color: var(--ink2); }
-.tab.on { color: var(--ink); border-bottom-color: var(--teal); }
-.tab-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.tbadge {
-  font-size: 8px;
-  padding: 1px 6px;
-  border-radius: 2px;
-  background: var(--bg3);
-  color: var(--ink3);
-  font-family: var(--mono);
-}
-.tab.on .tbadge { background: var(--teal); color: var(--bg); }
+/* ── TAB BAR (HORIZONTAL) ── */
+.tab-bar{background:var(--bg1);border-bottom:1px solid var(--bd);padding:0 32px;display:flex;flex-direction:row;overflow-x:auto;scrollbar-width:none;position:sticky;top:104px;z-index:280}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab{padding:0 18px;height:40px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s;display:flex;align-items:center;gap:8px}
+.tab:hover{color:var(--ink2)}
+.tab.on{color:var(--ink);border-bottom-color:var(--teal)}
+.tab-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.tbadge{font-size:8px;padding:1px 6px;border-radius:2px;background:var(--bg3);color:var(--ink3);font-family:var(--mono)}
+.tab.on .tbadge{background:var(--teal);color:var(--bg)}
 
-/* ── MAIN CONTENT ── */
-.main { padding: 28px 32px 80px; }
-.city-view { display: none; }
-.city-view.on { display: block; }
+/* ── MAIN ── */
+.main{padding:28px 32px 80px}
+.city-view{display:none}
+.city-view.on{display:block}
 
 /* ── PAGE HEADER ── */
-.page-hd {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--bd);
-}
-.page-hd-left {}
-.page-title { font-size: 22px; font-weight: 700; color: var(--ink); letter-spacing: -.3px; }
-.page-sub { font-family: var(--mono); font-size: 8px; color: var(--ink3); letter-spacing: 1px; margin-top: 4px; }
-.yr-bar { display: flex; }
-.yr-btn {
-  padding: 6px 14px;
-  font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  border: 1px solid var(--bd2);
-  background: transparent;
-  color: var(--ink3);
-  cursor: pointer;
-  transition: all .15s;
-}
-.yr-btn:first-child { border-radius: 2px 0 0 2px; }
-.yr-btn:last-child  { border-radius: 0 2px 2px 0; border-left: none; }
-.yr-btn + .yr-btn   { border-left: none; }
-.yr-btn.on { background: var(--teal); color: var(--bg); border-color: var(--teal); font-weight: 700; }
+.page-hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--bd)}
+.page-title{font-size:22px;font-weight:700;color:var(--ink);letter-spacing:-.3px;margin-bottom:4px}
+.page-sub{font-family:var(--mono);font-size:8px;color:var(--ink3);letter-spacing:1.5px}
+.page-sub .scope-tag{color:var(--gold);font-weight:600}
+.yr-bar{display:flex}
+.yr-btn{padding:6px 14px;font-family:var(--mono);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid var(--bd2);background:transparent;color:var(--ink3);cursor:pointer;transition:all .15s}
+.yr-btn:first-child{border-radius:2px 0 0 2px}
+.yr-btn:last-child{border-radius:0 2px 2px 0;border-left:none}
+.yr-btn+.yr-btn{border-left:none}
+.yr-btn.on{background:var(--teal);color:var(--bg);border-color:var(--teal);font-weight:700}
 
-/* ── KPI CARDS ── */
-.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-bottom: 28px; background: var(--bd); border: 1px solid var(--bd); border-radius: 3px; overflow: hidden; }
-.kcard {
-  background: var(--bg1);
-  padding: 20px 22px;
-  position: relative;
-}
-.kcard::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-}
-.kcard.c-teal::before  { background: var(--teal); }
-.kcard.c-lime::before  { background: var(--lime); }
-.kcard.c-rose::before  { background: var(--rose); }
-.kcard.c-sky::before   { background: var(--sky); }
-.kcard-lbl { font-family: var(--mono); font-size: 8px; letter-spacing: 2px; color: var(--ink3); text-transform: uppercase; margin-bottom: 10px; }
-.kcard-val { font-family: var(--mono); font-size: 28px; font-weight: 700; line-height: 1; }
-.kcard-sub { font-family: var(--mono); font-size: 8px; color: var(--ink3); margin-top: 6px; }
+/* ── CONTEXT NOTICE ── */
+.context-notice{background:var(--bg2);border:1px solid var(--gold);border-left:3px solid var(--gold);border-radius:3px;padding:10px 16px;margin-bottom:20px;font-family:var(--mono);font-size:8px;color:var(--gold);letter-spacing:.5px;line-height:1.6}
+
+/* ── KPI ROW ── */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;margin-bottom:24px;background:var(--bd);border:1px solid var(--bd);border-radius:3px;overflow:hidden}
+.kcard{background:var(--bg1);padding:18px 20px;position:relative}
+.kcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kcard.k-teal::before{background:var(--teal)}
+.kcard.k-rose::before{background:var(--rose)}
+.kcard.k-lime::before{background:var(--lime)}
+.kcard.k-gold::before{background:var(--gold)}
+.kcard.k-sky::before{background:var(--sky)}
+.kcard.k-violet::before{background:var(--violet)}
+.kcard-lbl{font-family:var(--mono);font-size:7px;letter-spacing:2px;color:var(--ink3);text-transform:uppercase;margin-bottom:10px}
+.kcard-val{font-family:var(--mono);font-size:28px;font-weight:700;line-height:1}
+.kcard-sub{font-family:var(--mono);font-size:8px;color:var(--ink3);margin-top:6px}
 
 /* ── SECTION HEADING ── */
-.section-hd {
-  font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: var(--ink3);
-  margin-bottom: 14px;
-  margin-top: 28px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--bd);
-}
+.sec-hd{font-family:var(--mono);font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink3);padding-bottom:10px;border-bottom:1px solid var(--bd);margin-bottom:14px;margin-top:28px;display:flex;justify-content:space-between;align-items:center}
+.sec-hd-meta{font-size:7px;color:var(--ink3);letter-spacing:1px}
 
-/* ── GRID LAYOUTS ── */
-.grid-2  { display: grid; grid-template-columns: 1fr 1fr;     gap: 16px; margin-bottom: 16px; }
-.grid-21 { display: grid; grid-template-columns: 2fr 1fr;     gap: 16px; margin-bottom: 16px; }
-.mb24 { margin-bottom: 24px; }
+/* ── GRID ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+.g12{display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-bottom:16px}
+.mb24{margin-bottom:24px}
 
 /* ── CARD ── */
-.card { background: var(--bg1); border: 1px solid var(--bd); border-radius: 3px; overflow: hidden; }
-.card-hd {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--bd);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.card-title { font-family: var(--mono); font-size: 8px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink2); font-weight: 600; }
-.card-meta  { font-family: var(--mono); font-size: 8px; color: var(--ink3); }
-.card-body  { padding: 14px 16px; }
+.card{background:var(--bg1);border:1px solid var(--bd);border-radius:3px;overflow:hidden}
+.card-hd{padding:11px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-title{font-family:var(--mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);font-weight:600}
+.card-meta{font-family:var(--mono);font-size:8px;color:var(--ink3)}
+.card-body{padding:14px 16px}
 
-/* ── ADMIN LEVEL SWITCHER ── */
-.lvl-bar { display: flex; }
-.lvl-btn {
-  padding: 4px 12px;
-  font-family: var(--mono);
-  font-size: 8px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  border: 1px solid var(--bd2);
-  background: transparent;
-  color: var(--ink3);
-  cursor: pointer;
-  transition: all .15s;
-}
-.lvl-btn:first-child { border-radius: 2px 0 0 2px; }
-.lvl-btn:last-child  { border-radius: 0 2px 2px 0; border-left: none; }
-.lvl-btn + .lvl-btn  { border-left: none; }
-.lvl-btn.on { background: var(--violet); color: #fff; border-color: var(--violet); }
+/* ── TOOLTIP ── */
+.tooltip-wrap{position:relative}
+.tooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--bd2);border-radius:3px;padding:6px 10px;font-family:var(--mono);font-size:8px;color:var(--ink);white-space:nowrap;z-index:500;pointer-events:none;line-height:1.6}
+.tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--bd2)}
+.tooltip-wrap:hover .tooltip{display:block}
 
-/* ── PERMIT STATUS BARS ── */
-.pbar-row { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--bd); }
-.pbar-row:last-child { border-bottom: none; }
-.pbar-lbl { font-family: var(--mono); font-size: 9px; color: var(--ink2); width: 120px; flex-shrink: 0; }
-.pbar-track { flex: 1; height: 14px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
-.pbar-fill { height: 100%; border-radius: 2px; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; transition: width .8s ease; }
-.pbar-cnt { font-family: var(--mono); font-size: 8px; font-weight: 700; color: rgba(0,0,0,.85); }
-.pbar-pct { font-family: var(--mono); font-size: 9px; color: var(--ink3); width: 40px; text-align: right; flex-shrink: 0; }
-.yr-label { font-family: var(--mono); font-size: 8px; letter-spacing: 2px; color: var(--ink3); padding: 8px 0 6px; }
-.yr-label:first-child { padding-top: 0; }
+/* ── BAR CHARTS ── */
+.bar-row{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--bd);cursor:default}
+.bar-row:last-child{border-bottom:none}
+.bar-lbl{font-family:var(--mono);font-size:9px;color:var(--ink2);flex:0 0 100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-lbl.w130{flex:0 0 130px}
+.bar-track{flex:1;height:14px;background:var(--bg3);border-radius:2px;overflow:visible;position:relative}
+.bar-fill{height:100%;border-radius:2px;transition:width .7s ease;position:relative}
+.bar-stacked{flex:1;height:14px;background:var(--bg3);border-radius:2px;overflow:hidden;display:flex;gap:1px}
+.bar-seg{height:100%;transition:width .7s}
+.bar-val{font-family:var(--mono);font-size:9px;font-weight:700;flex:0 0 60px;text-align:right}
+.bar-pct{font-family:var(--mono);font-size:8px;color:var(--ink3);flex:0 0 40px;text-align:right}
 
-/* ── ZONE BARS ── */
-.zbar-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--bd); }
-.zbar-row:last-child { border-bottom: none; }
-.zbar-code { font-family: var(--mono); font-size: 9px; font-weight: 700; color: var(--ink); width: 46px; flex-shrink: 0; }
-.zbar-track { flex: 1; height: 12px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
-.zbar-fill { height: 100%; background: #f06080cc; border-radius: 2px; display: flex; align-items: center; padding-left: 6px; transition: width .7s ease; }
-.zbar-cnt { font-family: var(--mono); font-size: 8px; font-weight: 700; color: rgba(0,0,0,.8); white-space: nowrap; }
-.zbar-pct { font-family: var(--mono); font-size: 8px; color: var(--ink3); width: 38px; text-align: right; flex-shrink: 0; }
+/* bar label inside fill */
+.bar-inner-lbl{font-family:var(--mono);font-size:7px;font-weight:700;color:rgba(0,0,0,.75);position:absolute;right:4px;top:50%;transform:translateY(-50%);white-space:nowrap;pointer-events:none}
 
-/* ── ADMIN BREAKDOWN ── */
-.adm-scroll { max-height: 290px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--bd2) transparent; }
-.adm-scroll::-webkit-scrollbar { width: 3px; }
-.adm-scroll::-webkit-scrollbar-thumb { background: var(--bd2); }
-.adm-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--bd); }
-.adm-row:last-child { border-bottom: none; }
-.adm-name { font-family: var(--mono); font-size: 8px; color: var(--ink2); width: 108px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.adm-stacked { flex: 1; display: flex; height: 10px; border-radius: 2px; overflow: hidden; gap: 1px; }
-.adm-seg { height: 100%; transition: width .6s; }
-.adm-total { font-family: var(--mono); font-size: 8px; color: var(--ink3); width: 38px; text-align: right; flex-shrink: 0; }
-.adm-illpct { font-family: var(--mono); font-size: 8px; font-weight: 700; width: 34px; text-align: right; flex-shrink: 0; }
+/* ── SECTOR CHANGE TABLE ── */
+.chg-table{width:100%;border-collapse:collapse}
+.chg-table th{font-family:var(--mono);font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);padding:0 10px 8px;text-align:right;border-bottom:1px solid var(--bd2);white-space:nowrap}
+.chg-table th:first-child{text-align:left;padding-left:0}
+.chg-table td{font-family:var(--mono);font-size:9px;color:var(--ink2);padding:7px 10px;border-bottom:1px solid var(--bd);text-align:right;vertical-align:middle}
+.chg-table td:first-child{text-align:left;padding-left:0;font-size:10px;font-weight:600;color:var(--ink)}
+.chg-table tr:last-child td{border-bottom:none}
+.chg-table tr:hover td{background:var(--bg2)}
 
-/* ── OVERVIEW GRID ── */
-.ov-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--bd); border: 1px solid var(--bd); border-radius: 3px; overflow: hidden; margin-bottom: 28px; }
-.ov-card { background: var(--bg1); padding: 20px; cursor: pointer; transition: background .15s; position: relative; }
-.ov-card:hover { background: var(--bg2); }
-.ov-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
-.ov-city-accent { }
-.ov-cname { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
-.ov-cprov { font-family: var(--mono); font-size: 7px; color: var(--ink3); letter-spacing: 1px; margin-bottom: 12px; }
-.ov-total { font-family: var(--mono); font-size: 24px; font-weight: 700; line-height: 1; margin-bottom: 3px; }
-.ov-total-lbl { font-family: var(--mono); font-size: 7px; color: var(--ink3); letter-spacing: 1px; margin-bottom: 14px; }
-.ov-bar-wrap { margin-bottom: 6px; }
-.ov-bar-hd { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
-.ov-bar-name { font-family: var(--mono); font-size: 8px; color: var(--ink3); }
-.ov-bar-val  { font-family: var(--mono); font-size: 9px; font-weight: 700; }
-.ov-bar-track { height: 3px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
-.ov-bar-fill  { height: 100%; border-radius: 2px; transition: width .8s; }
-.ov-divider { height: 1px; background: var(--bd); margin: 12px 0; }
-.ov-rate-row { display: flex; justify-content: space-between; align-items: baseline; }
-.ov-rate-lbl { font-family: var(--mono); font-size: 7px; color: var(--ink3); letter-spacing: 1.5px; text-transform: uppercase; }
-.ov-rate-val { font-family: var(--mono); font-size: 16px; font-weight: 700; }
-.ov-link { font-family: var(--mono); font-size: 7px; color: var(--teal); letter-spacing: 1px; margin-top: 10px; }
+/* ── ZONE TABLE ── */
+.zone-tbl{width:100%;border-collapse:collapse}
+.zone-tbl th{font-family:var(--mono);font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);padding:0 8px 8px;text-align:right;border-bottom:1px solid var(--bd2);white-space:nowrap;position:sticky;top:0;background:var(--bg2)}
+.zone-tbl th:first-child{text-align:left;padding-left:0}
+.zone-tbl td{font-family:var(--mono);font-size:9px;color:var(--ink2);padding:6px 8px;border-bottom:1px solid var(--bd);text-align:right;vertical-align:middle}
+.zone-tbl td:first-child{text-align:left;padding-left:0}
+.zone-tbl tr:last-child td{border-bottom:none}
+.zone-tbl tr:hover td{background:var(--bg2)}
+.zone-code{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--teal)}
 
-/* ── COMPARATIVE ROWS ── */
-.cmp-row { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--bd); cursor: pointer; }
-.cmp-row:last-child { border-bottom: none; }
-.cmp-row:hover .cmp-name { color: var(--ink); }
-.cmp-rank { font-family: var(--mono); font-size: 8px; color: var(--ink3); width: 16px; flex-shrink: 0; }
-.cmp-name { font-family: var(--mono); font-size: 9px; font-weight: 700; width: 74px; flex-shrink: 0; transition: color .15s; }
-.cmp-stacked { flex: 1; display: flex; height: 14px; border-radius: 2px; overflow: hidden; gap: 1px; }
-.cmp-seg { height: 100%; transition: width .8s; }
-.cmp-tot { font-family: var(--mono); font-size: 9px; color: var(--ink2); width: 42px; text-align: right; flex-shrink: 0; }
+/* ── DATA DOWNLOAD TABLE ── */
+.dl-table-wrap{overflow:auto;max-height:320px;scrollbar-width:thin;scrollbar-color:var(--bd2) transparent}
+.dl-table-wrap::-webkit-scrollbar{width:3px;height:3px}
+.dl-table-wrap::-webkit-scrollbar-thumb{background:var(--bd2)}
+.dl-table{width:100%;border-collapse:collapse;min-width:700px}
+.dl-table th{font-family:var(--mono);font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);padding:6px 10px;border-bottom:1px solid var(--bd2);text-align:left;white-space:nowrap;position:sticky;top:0;background:var(--bg2)}
+.dl-table td{font-family:var(--mono);font-size:8px;color:var(--ink2);padding:5px 10px;border-bottom:1px solid var(--bd);white-space:nowrap}
+.dl-table tr:hover td{background:var(--bg2)}
+.dl-btn{font-family:var(--mono);font-size:8px;letter-spacing:1.5px;padding:6px 14px;background:var(--teal);color:var(--bg);border:none;border-radius:2px;cursor:pointer;font-weight:700}
+.dl-btn:hover{opacity:.85}
 
-/* ── RISK ROWS ── */
-.risk-row { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--bd); cursor: pointer; }
-.risk-row:last-child { border-bottom: none; }
-.risk-row:hover .risk-name { color: var(--ink); }
-.risk-rk   { font-family: var(--mono); font-size: 8px; color: var(--ink3); width: 16px; }
-.risk-name { font-family: var(--mono); font-size: 9px; font-weight: 700; width: 74px; flex-shrink: 0; transition: color .15s; }
-.risk-track { flex: 1; height: 10px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
-.risk-fill  { height: 100%; border-radius: 2px; transition: width .7s; }
-.risk-pct   { font-family: var(--mono); font-size: 9px; font-weight: 700; width: 38px; text-align: right; }
+/* ── MAP ── */
+.map-wrap{position:relative}
+.map-div{width:100%;height:380px;background:var(--bg2)}
+.map-legend-bar{display:flex;gap:20px;padding:8px 16px;border-top:1px solid var(--bd);background:var(--bg1);align-items:center}
+.map-key{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:8px;color:var(--ink3);letter-spacing:1px}
+.map-swatch{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.map-hint{font-family:var(--mono);font-size:8px;color:var(--ink3);margin-left:auto}
 
-/* ── MAP LEGEND ── */
-.map-legend {
-  display: flex;
-  gap: 20px;
-  padding: 9px 16px;
-  border-top: 1px solid var(--bd);
-  background: var(--bg1);
-  align-items: center;
-}
-.map-key { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 8px; color: var(--ink3); letter-spacing: 1px; }
-.map-key-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-.map-hint { font-family: var(--mono); font-size: 8px; color: var(--ink3); margin-left: auto; }
-#allMapDiv { width: 100%; height: 380px; background: var(--bg2); display: block; }
+/* ── ADMLEVEL SWITCHER ── */
+.lvl-bar{display:flex}
+.lvl-btn{padding:4px 12px;font-family:var(--mono);font-size:8px;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--bd2);background:transparent;color:var(--ink3);cursor:pointer;transition:all .15s}
+.lvl-btn:first-child{border-radius:2px 0 0 2px}
+.lvl-btn:last-child{border-radius:0 2px 2px 0;border-left:none}
+.lvl-btn+.lvl-btn{border-left:none}
+.lvl-btn.on{background:var(--violet);color:#fff;border-color:var(--violet)}
 
-@media(max-width:1100px){ .kpi-row{grid-template-columns:repeat(2,1fr);} .ov-grid{grid-template-columns:repeat(3,1fr);} }
-@media(max-width:800px)  { .kpi-row{grid-template-columns:1fr 1fr;} .ov-grid{grid-template-columns:1fr 1fr;} .grid-21{grid-template-columns:1fr;} }
+/* ── OVERVIEW CARDS ── */
+.ov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bd);border:1px solid var(--bd);border-radius:3px;overflow:hidden;margin-bottom:24px}
+.ov-card{background:var(--bg1);padding:18px 20px 16px;cursor:pointer;transition:background .15s;border-top:2px solid transparent}
+.ov-card:hover{background:var(--bg2)}
+.ov-name{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.ov-province{font-family:var(--mono);font-size:7px;color:var(--ink3);letter-spacing:1px;margin-bottom:12px}
+.ov-big{font-family:var(--mono);font-size:24px;font-weight:700;line-height:1}
+.ov-lbl{font-family:var(--mono);font-size:7px;color:var(--ink3);letter-spacing:1.5px;margin-top:3px;margin-bottom:12px}
+.ov-seg{height:5px;background:var(--bg3);border-radius:2px;overflow:hidden;display:flex;gap:1px;margin-bottom:10px}
+.ov-seg-fill{height:100%;transition:width .8s}
+.ov-rate-row{display:flex;justify-content:space-between;align-items:baseline}
+.ov-rate-lbl{font-family:var(--mono);font-size:7px;color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase}
+.ov-rate-val{font-family:var(--mono);font-size:14px;font-weight:700}
+
+/* ── SCROLL BOX ── */
+.scroll-box{max-height:280px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bd2) transparent}
+.scroll-box::-webkit-scrollbar{width:3px}
+.scroll-box::-webkit-scrollbar-thumb{background:var(--bd2)}
+
+/* ── YR LABEL ── */
+.yr-label{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--ink3);padding:8px 0 6px}
+.yr-label:first-child{padding-top:0}
+
+@media(max-width:1100px){.kpi-row{grid-template-columns:repeat(3,1fr)}.ov-grid{grid-template-columns:repeat(2,1fr)}.g2,.g21,.g12{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
 <!-- MASTHEAD -->
 <div class="masthead">
-  <div>
-    <div class="mh-title">Building Permit <span>Compliance</span></div>
-    <div class="mh-sub">URBAN RWANDA &nbsp;·&nbsp; 2023–2025</div>
+  <div class="mh-left">
+    <div class="mh-title">NLA · Urban Construction <span>Intelligence</span></div>
+    <div class="mh-sub">CHANGE DETECTION 2023 → 2025 · URBANIZED SECTORS ONLY</div>
   </div>
   <div class="gkpi-row">
     <div class="gkpi">
-      <div class="gkpi-lbl">Total Detected</div>
-      <div class="gkpi-val" style="color:var(--teal)" id="g_total">—</div>
-      <div class="gkpi-sub">Buildings analysed</div>
+      <div class="gkpi-lbl">Baseline 2023</div>
+      <div class="gkpi-val" style="color:var(--sky)" id="g_base">—</div>
+      <div class="gkpi-sub">Existing buildings</div>
     </div>
     <div class="gkpi">
-      <div class="gkpi-lbl">Legal — With Permit</div>
-      <div class="gkpi-val" style="color:var(--lime)" id="g_legal">—</div>
-      <div class="gkpi-sub">Verified compliant</div>
+      <div class="gkpi-lbl">New Detections 2025</div>
+      <div class="gkpi-val" style="color:var(--violet)" id="g_new">—</div>
+      <div class="gkpi-sub">New constructions</div>
     </div>
     <div class="gkpi">
-      <div class="gkpi-lbl">Illegal — Without Permit</div>
-      <div class="gkpi-val" style="color:var(--rose)" id="g_illegal">—</div>
-      <div class="gkpi-sub">Violations detected</div>
+      <div class="gkpi-lbl">Without Permit</div>
+      <div class="gkpi-val" style="color:var(--rose)" id="g_ill">—</div>
+      <div class="gkpi-sub">Illegal new builds</div>
     </div>
     <div class="gkpi">
-      <div class="gkpi-lbl">Compliance Rate</div>
-      <div class="gkpi-val" style="color:var(--rose)" id="g_rate">—</div>
-      <div class="gkpi-sub" id="g_rate_sub">—</div>
+      <div class="gkpi-lbl">Non-Compliance Rate</div>
+      <div class="gkpi-val" style="color:var(--gold)" id="g_rate">—</div>
+      <div class="gkpi-sub" id="g_rate_sub">of new detections</div>
     </div>
   </div>
 </div>
 
-<!-- STATUS -->
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-lbl">Filters</div>
+  <div class="filter-sep"></div>
+  <div class="fsel-wrap">
+    <div class="fsel-name">SECTOR</div>
+    <select class="fsel" id="f_sector" onchange="applyFilters()"><option value="">All Sectors</option></select>
+  </div>
+  <div class="fsel-wrap">
+    <div class="fsel-name">ZONE</div>
+    <select class="fsel" id="f_zone" onchange="applyFilters()"><option value="">All Zones</option></select>
+  </div>
+  <div class="fsel-wrap">
+    <div class="fsel-name">STATUS</div>
+    <select class="fsel" id="f_legal" onchange="applyFilters()">
+      <option value="">All</option>
+      <option value="Illegal">Illegal (Without Permit)</option>
+      <option value="Legal">Legal (With Permit)</option>
+      <option value="Existing">Existing (Baseline 2023)</option>
+    </select>
+  </div>
+  <div class="fsel-wrap">
+    <div class="fsel-name">YEAR</div>
+    <select class="fsel" id="f_year" onchange="applyFilters()">
+      <option value="">All Years</option>
+      <option value="2023_Cities">2023 Baseline</option>
+      <option value="2025">2025 New</option>
+    </select>
+  </div>
+  <button class="filter-reset" onclick="resetFilters()">Reset</button>
+  <div class="filter-count" id="filterCount"></div>
+</div>
+
+<!-- STATUS BAR -->
 <div class="sbar gone" id="sbar">
   <div class="sdot"></div><span id="stxt">Loading…</span>
 </div>
 
-<!-- TAB BAR -->
+<!-- TAB BAR (horizontal) -->
 <div class="tab-bar" id="tabBar">
   <button class="tab on" onclick="showTab('all')" id="tab_all">
     <span class="tab-dot" style="background:var(--teal)"></span>
@@ -370,242 +296,128 @@ html, body { height: 100%; background: var(--bg); color: var(--ink); font-family
 <!-- MAIN -->
 <div class="main">
 
-  <!-- ALL DISTRICTS VIEW -->
+  <!-- ═══ ALL DISTRICTS ═══ -->
   <div class="city-view on" id="view_all">
     <div class="page-hd">
-      <div class="page-hd-left">
-        <div class="page-title">All Districts</div>
-        <div class="page-sub">7 URBAN AREAS &nbsp;·&nbsp; COMPARATIVE OVERVIEW</div>
+      <div>
+        <div class="page-title">All Urban Districts</div>
+        <div class="page-sub">7 DISTRICTS · <span class="scope-tag">URBANIZED SECTORS ONLY — NOT FULL DISTRICT AREA</span></div>
       </div>
-      <div class="yr-bar" id="allYrBar">
-        <button class="yr-btn on"  onclick="setAllYr('both')">Both</button>
-        <button class="yr-btn"     onclick="setAllYr('2023')">2023</button>
-        <button class="yr-btn"     onclick="setAllYr('2025')">2025</button>
-      </div>
+    </div>
+
+    <div class="context-notice">
+      SCOPE NOTICE — This analysis covers only the <strong>urbanized sectors</strong> within each district where 2025 satellite imagery was acquired.
+      The 2023 baseline represents buildings detected within those specific sectors. New 2025 detections are compared against that baseline only.
+      This is NOT a full district-wide inventory.
     </div>
 
     <div class="ov-grid" id="ovGrid"></div>
 
-    <div class="grid-2 mb24">
+    <div class="g2 mb24">
       <div class="card">
         <div class="card-hd">
-          <div class="card-title">Permit Status by District</div>
-          <div class="card-meta" id="cmpMeta">—</div>
+          <div class="card-title">New Detections 2025 — by District</div>
+          <div class="card-meta">Legal (teal) · Illegal (red)</div>
         </div>
         <div class="card-body" id="cmpBars"></div>
       </div>
       <div class="card">
         <div class="card-hd">
-          <div class="card-title">Illegal Buildings — Risk Ranking</div>
-          <div class="card-meta">% without permit</div>
+          <div class="card-title">Non-Compliance Ranking</div>
+          <div class="card-meta">% of new builds without permit</div>
         </div>
         <div class="card-body" id="riskBars"></div>
       </div>
     </div>
-
-    <div class="card mb24">
-      <div class="card-hd">
-        <div class="card-title">Permit Coverage Map — All Urban Areas</div>
-        <div style="display:flex;gap:16px;">
-          <span class="map-key"><span class="map-key-swatch" style="background:#00d4b8"></span>Legal</span>
-          <span class="map-key"><span class="map-key-swatch" style="background:#f06080"></span>Illegal</span>
-        </div>
-      </div>
-      <div id="allMapDiv"></div>
-      <div class="map-legend">
-        <span class="map-hint" id="allMapHint">Loading map…</span>
-      </div>
-    </div>
   </div>
 
-  <!-- CITY VIEWS (injected by JS) -->
+  <!-- ═══ DISTRICT VIEWS (injected) ═══ -->
   <div id="cityViews"></div>
-
 </div>
+
+<!-- TOOLTIP GLOBAL -->
+<div id="gTooltip" style="display:none;position:fixed;background:var(--bg3);border:1px solid var(--bd2);border-radius:3px;padding:7px 12px;font-family:var(--mono);font-size:9px;color:var(--ink);z-index:1000;pointer-events:none;line-height:1.7"></div>
 
 <script>
 // ══════════════════════════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════════════════════════
-const WEBMAP_ID = 'b6f2526893bc45f681b1581a568a5422';
 const ORG = 'https://services7.arcgis.com/htgaiKX6RV2DDGgK/arcgis/rest/services';
+const WEBMAP_ID = 'b6f2526893bc45f681b1581a568a5422';
 
 const CITIES = [
-  { id:'kayonza',   label:'Kayonza',   color:'#00d4b8', area:'Eastern Province',
-    svc:`${ORG}/Building_Kayonza_urban/FeatureServer/0` },
-  { id:'kirehe',    label:'Kirehe',    color:'#48b4f0', area:'Eastern Province',
-    svc:'https://services7.arcgis.com/htgaiKX6RV2DDGgK/arcgis/rest/services/Construction_Kirehe_Cities/FeatureServer/0' },
-  { id:'nyagatare', label:'Nyagatare', color:'#a080f0', area:'Eastern Province',
-    svc:'https://services7.arcgis.com/htgaiKX6RV2DDGgK/arcgis/rest/services/Construction_Nyagatare_Cities/FeatureServer/0' },
-  { id:'huye',      label:'Huye',      color:'#f0c060', area:'Southern Province',
-    svc:'https://services7.arcgis.com/htgaiKX6RV2DDGgK/arcgis/rest/services/Buildings_Huye_Cities/FeatureServer/0' },
-  { id:'rubavu',    label:'Rubavu',    color:'#78d890', area:'Western Province',
-    svc:'https://services7.arcgis.com/htgaiKX6RV2DDGgK/arcgis/rest/services/Buildings_Rubavu_Cities/FeatureServer/0' },
-  { id:'musanze',   label:'Musanze',   color:'#f06080', area:'Northern Province',
-    svc:'https://services7.arcgis.com/htgaiKX6RV2DDGgK/arcgis/rest/services/Building_Musanze_Cities/FeatureServer/0' },
-  { id:'rusizi',    label:'Rusizi',    color:'#f08040', area:'Western Province',
-    svc:'https://services7.arcgis.com/htgaiKX6RV2DDGgK/arcgis/rest/services/Buildings_Rusizi_Cities/FeatureServer/0' },
+  {id:'kayonza',   label:'Kayonza',   color:'#00d4b8', province:'Eastern Province',
+   svc:`${ORG}/Building_Kayonza_urban/FeatureServer/0`},
+  {id:'kirehe',    label:'Kirehe',    color:'#48b4f0', province:'Eastern Province',
+   svc:`${ORG}/Construction_Kirehe_Cities/FeatureServer/0`},
+  {id:'nyagatare', label:'Nyagatare', color:'#a080f0', province:'Eastern Province',
+   svc:`${ORG}/Construction_Nyagatare_Cities/FeatureServer/0`},
+  {id:'huye',      label:'Huye',      color:'#f0c060', province:'Southern Province',
+   svc:`${ORG}/Buildings_Huye_Cities/FeatureServer/0`},
+  {id:'rubavu',    label:'Rubavu',    color:'#78d890', province:'Western Province',
+   svc:`${ORG}/Buildings_Rubavu_Cities/FeatureServer/0`},
+  {id:'musanze',   label:'Musanze',   color:'#f06080', province:'Northern Province',
+   svc:`${ORG}/Building_Musanze_Cities/FeatureServer/0`},
+  {id:'rusizi',    label:'Rusizi',    color:'#f08040', province:'Western Province',
+   svc:`${ORG}/Buildings_Rusizi_Cities/FeatureServer/0`},
 ];
 
-const LEGAL_KEYS = ['Legal','Illegal'];
-const LEGAL = { 'Legal':{ color:'#00d4b8' }, 'Illegal':{ color:'#f06080' } };
-const LK_PERMIT  = 'Legal';
-const LK_ILLEGAL = 'Illegal';
+// Field names from real data profile
+const F = {
+  LEGAL:   'legal_t',    // 'Existing' | 'Illegal' | 'Legal'
+  YEAR:    'year_t',     // '2023_Cities' | '2025'
+  STATUS:  'status_t',   // 'Existing' | 'New Detection'
+  SECTOR:  'sector',
+  CELL:    'cell',
+  VILLAGE: 'village',
+  ZONE:    'zone_code',
+  ZONING:  'zoning',
+  GENLU:   'gen_lu',
+};
 
+// Active filters (applied per-city query)
+let activeFilters = {sector:'', zone:'', legal:'', year:''};
+let currentCity = null; // which city view is open
+
+// Raw data store
 const D = {};
 CITIES.forEach(c => {
   D[c.id] = {
-    total:0, loaded:false,
-    byLegal:{}, byLegalYear:{'2023':{},'2025':{}},
-    byZoneIllegal:{}, bySector:{}, byCell:{}, byVillage:{},
+    loaded: false,
+    baseline: 0, newTotal: 0, illegal: 0, legal: 0,
+    bySector: {}, byCell: {}, byVillage: {}, byZone: {}, byGenLu: {},
+    allSectors: new Set(), allZones: new Set(),
+    rawRows: [],   // for CSV download
   };
 });
 
-let allYr = 'both';
-const cityYr  = {}; CITIES.forEach(c => cityYr[c.id]  = 'both');
-const cityAdm = {}; CITIES.forEach(c => cityAdm[c.id] = 'sector');
-
 const $    = id => document.getElementById(id);
-const fmt  = n  => (n||0).toLocaleString();
-const fmtK = v  => v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(1)+'K':String(v||0);
+const fmt  = n  => Number(n||0).toLocaleString();
 const pct  = (a,b) => b>0?(a/b*100).toFixed(1)+'%':'—';
 const pctN = (a,b) => b>0?parseFloat((a/b*100).toFixed(1)):0;
 
-// ══════════════════════════════════════════════════════════════
-//  TABS
-// ══════════════════════════════════════════════════════════════
-function buildTabs(){
-  const bar = $('tabBar');
-  CITIES.forEach(c => {
-    const btn = document.createElement('button');
-    btn.className = 'tab';
-    btn.id = `tab_${c.id}`;
-    btn.onclick = () => showTab(c.id);
-    btn.innerHTML = `<span class="tab-dot" style="background:${c.color}"></span>${c.label}<span class="tbadge" id="badge_${c.id}">—</span>`;
-    bar.appendChild(btn);
-  });
+// ── Tooltip
+const gTip = $('gTooltip');
+function showTip(e, html){
+  gTip.innerHTML = html;
+  gTip.style.display = 'block';
+  moveTip(e);
 }
+function moveTip(e){
+  const x = e.clientX+14, y = e.clientY-10;
+  gTip.style.left = Math.min(x, window.innerWidth-200)+'px';
+  gTip.style.top  = Math.max(y-gTip.offsetHeight, 4)+'px';
+}
+function hideTip(){ gTip.style.display='none'; }
+document.addEventListener('mousemove', e => { if(gTip.style.display!=='none') moveTip(e); });
 
-function showTab(id){
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-  document.querySelectorAll('.city-view').forEach(v => v.classList.remove('on'));
-  $(`tab_${id}`)?.classList.add('on');
-  $(`view_${id}`)?.classList.add('on');
-  if(id !== 'all') initCityMap(id);
+function attachBarTip(el, html){
+  el.addEventListener('mouseenter', e => showTip(e, html));
+  el.addEventListener('mouseleave', hideTip);
 }
 
 // ══════════════════════════════════════════════════════════════
-//  BUILD CITY HTML — zero SVGs, clean structure
-// ══════════════════════════════════════════════════════════════
-function buildCityViews(){
-  const container = $('cityViews');
-  CITIES.forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'city-view';
-    div.id = `view_${c.id}`;
-    div.innerHTML = `
-      <div class="page-hd">
-        <div class="page-hd-left">
-          <div class="page-title">${c.label}</div>
-          <div class="page-sub" id="csub_${c.id}">${c.area.toUpperCase()} · LOADING…</div>
-        </div>
-        <div class="yr-bar">
-          <button class="yr-btn on"  id="yrB_${c.id}"  onclick="setCityYr('${c.id}','both')">Both</button>
-          <button class="yr-btn"     id="yr23_${c.id}" onclick="setCityYr('${c.id}','2023')">2023</button>
-          <button class="yr-btn"     id="yr25_${c.id}" onclick="setCityYr('${c.id}','2025')">2025</button>
-        </div>
-      </div>
-
-      <div class="kpi-row">
-        <div class="kcard c-teal">
-          <div class="kcard-lbl">Total Detected</div>
-          <div class="kcard-val" style="color:${c.color}" id="kTot_${c.id}">—</div>
-          <div class="kcard-sub" id="kTotS_${c.id}">Buildings analysed</div>
-        </div>
-        <div class="kcard c-lime">
-          <div class="kcard-lbl">Legal — With Permit</div>
-          <div class="kcard-val" style="color:var(--lime)" id="kPermit_${c.id}">—</div>
-          <div class="kcard-sub" id="kPermitS_${c.id}">Verified compliant</div>
-        </div>
-        <div class="kcard c-rose">
-          <div class="kcard-lbl">Illegal — Without Permit</div>
-          <div class="kcard-val" style="color:var(--rose)" id="kIll_${c.id}">—</div>
-          <div class="kcard-sub" id="kIllS_${c.id}">Violations detected</div>
-        </div>
-        <div class="kcard c-sky">
-          <div class="kcard-lbl">Compliance Rate</div>
-          <div class="kcard-val" style="color:var(--rose)" id="kRate_${c.id}">—</div>
-          <div class="kcard-sub" id="kRateS_${c.id}">—</div>
-        </div>
-      </div>
-
-      <div class="section-hd">Illegal Buildings by Zone Code</div>
-      <div class="grid-2 mb24">
-        <div class="card">
-          <div class="card-hd">
-            <div class="card-title">Without Permit — Zone Distribution</div>
-            <div class="card-meta" id="zmeta_${c.id}">—</div>
-          </div>
-          <div class="card-body" id="zoneBars_${c.id}"></div>
-        </div>
-        <div class="card">
-          <div class="card-hd">
-            <div class="card-title">Top Zones by Illegal Count</div>
-            <div class="card-meta" id="ztop_${c.id}">Top 10</div>
-          </div>
-          <div class="card-body" id="zoneTop_${c.id}"></div>
-        </div>
-      </div>
-
-      <div class="section-hd">Buildings by Legality Status</div>
-      <div class="grid-21 mb24">
-        <div class="card">
-          <div class="card-hd">
-            <div class="card-title">Permit Status — 2023 vs 2025</div>
-            <div class="card-meta" id="pmeta_${c.id}">—</div>
-          </div>
-          <div class="card-body">
-            <div class="yr-label">2023</div>
-            <div id="pb23_${c.id}"></div>
-            <div class="yr-label" style="margin-top:12px;">2025</div>
-            <div id="pb25_${c.id}"></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-hd">
-            <div class="card-title">By Administrative Level</div>
-            <div class="lvl-bar" id="lvl_${c.id}">
-              <button class="lvl-btn on"  onclick="setAdm('${c.id}','sector')">Sector</button>
-              <button class="lvl-btn"     onclick="setAdm('${c.id}','cell')">Cell</button>
-              <button class="lvl-btn"     onclick="setAdm('${c.id}','village')">Village</button>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="adm-scroll" id="admBars_${c.id}"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card mb24">
-        <div class="card-hd">
-          <div class="card-title">${c.label} — Building Permit Map</div>
-          <div style="display:flex;gap:16px;">
-            <span class="map-key"><span class="map-key-swatch" style="background:#00d4b8"></span>Legal</span>
-            <span class="map-key"><span class="map-key-swatch" style="background:#f06080"></span>Illegal</span>
-          </div>
-        </div>
-        <div id="mapDiv_${c.id}" style="width:100%;height:380px;background:var(--bg2);"></div>
-        <div class="map-legend">
-          <span class="map-hint" id="mhint_${c.id}">Loading map…</span>
-        </div>
-      </div>
-    `;
-    container.appendChild(div);
-  });
-}
-
-// ══════════════════════════════════════════════════════════════
-//  DATA FETCH
+//  API
 // ══════════════════════════════════════════════════════════════
 async function qStat(svc, where, groupBy){
   const body = new URLSearchParams();
@@ -615,237 +427,238 @@ async function qStat(svc, where, groupBy){
   body.set('returnGeometry','false');
   body.set('f','json');
   try {
-    const r = await fetch(svc+'/query', { method:'POST', body, headers:{'Content-Type':'application/x-www-form-urlencoded'} });
+    const r = await fetch(svc+'/query',{method:'POST',body,
+      headers:{'Content-Type':'application/x-www-form-urlencoded'}});
     const j = await r.json();
     if(j.error) throw new Error(j.error.message);
     return j.features||[];
-  } catch(e){ console.warn('qStat', groupBy, e.message); return []; }
+  } catch(e){ console.warn('qStat',groupBy,e.message); return []; }
 }
 
+// Build WHERE clause from active filters
+function buildWhere(extraWhere){
+  const parts = [];
+  if(activeFilters.sector) parts.push(`${F.SECTOR}='${activeFilters.sector.replace(/'/g,"''")}'`);
+  if(activeFilters.zone)   parts.push(`${F.ZONE}='${activeFilters.zone}'`);
+  if(activeFilters.legal)  parts.push(`${F.LEGAL}='${activeFilters.legal}'`);
+  if(activeFilters.year)   parts.push(`${F.YEAR}='${activeFilters.year}'`);
+  if(extraWhere)           parts.push(extraWhere);
+  return parts.length ? parts.join(' AND ') : '1=1';
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LOAD CITY — initial full load
+// ══════════════════════════════════════════════════════════════
 async function loadCity(city){
   const d = D[city.id];
-  setStatus(`${city.label} · permit status…`);
+  setStatus(`${city.label} · loading…`);
 
-  const r1 = await qStat(city.svc,'1=1','legal_t,year_t');
+  // sector × legal_t
+  const r1 = await qStat(city.svc,'1=1',`${F.SECTOR},${F.LEGAL}`);
   r1.forEach(f => {
-    const lt  = f.attributes.legal_t||'Unknown';
-    const yr  = String(f.attributes.year_t||'');
+    const sec = f.attributes[F.SECTOR]||'Unknown';
+    const lt  = f.attributes[F.LEGAL]||'Unknown';
     const cnt = f.attributes.cnt||0;
-    d.byLegal[lt] = (d.byLegal[lt]||0)+cnt;
-    if(!d.byLegalYear[yr]) d.byLegalYear[yr]={};
-    d.byLegalYear[yr][lt] = (d.byLegalYear[yr][lt]||0)+cnt;
+    if(!d.bySector[sec]) d.bySector[sec]={baseline:0,illegal:0,legal:0};
+    if(lt==='Existing')  { d.bySector[sec].baseline+=cnt; d.baseline+=cnt; }
+    if(lt==='Illegal')   { d.bySector[sec].illegal +=cnt; d.newTotal+=cnt; d.illegal+=cnt; }
+    if(lt==='Legal')     { d.bySector[sec].legal   +=cnt; d.newTotal+=cnt; d.legal  +=cnt; }
+    d.allSectors.add(sec);
   });
-  d.total = Object.values(d.byLegal).reduce((s,v)=>s+v,0);
 
-  setStatus(`${city.label} · zone analysis…`);
-  const r2 = await qStat(city.svc, `legal_t='Illegal'`, 'zone_code');
+  // cell × legal_t
+  const r2 = await qStat(city.svc,'1=1',`${F.CELL},${F.LEGAL}`);
   r2.forEach(f => {
-    const zc  = f.attributes.zone_code||'Unknown';
+    const cel = f.attributes[F.CELL]||'Unknown';
+    const lt  = f.attributes[F.LEGAL]||'Unknown';
     const cnt = f.attributes.cnt||0;
-    d.byZoneIllegal[zc] = (d.byZoneIllegal[zc]||0)+cnt;
+    if(!d.byCell[cel]) d.byCell[cel]={baseline:0,illegal:0,legal:0};
+    if(lt==='Existing') d.byCell[cel].baseline+=cnt;
+    if(lt==='Illegal')  d.byCell[cel].illegal +=cnt;
+    if(lt==='Legal')    d.byCell[cel].legal   +=cnt;
   });
 
-  setStatus(`${city.label} · sectors…`);
-  const r3 = await qStat(city.svc,'1=1','sector,legal_t');
+  // village × legal_t (new only)
+  const r3 = await qStat(city.svc,`${F.LEGAL}<>'Existing'`,`${F.VILLAGE},${F.LEGAL}`);
   r3.forEach(f => {
-    const sec = f.attributes.sector||'Unknown';
-    const lt  = f.attributes.legal_t||'Unknown';
+    const vil = f.attributes[F.VILLAGE]||'Unknown';
+    const lt  = f.attributes[F.LEGAL]||'Unknown';
     const cnt = f.attributes.cnt||0;
-    if(!d.bySector[sec]) d.bySector[sec]={};
-    d.bySector[sec][lt] = (d.bySector[sec][lt]||0)+cnt;
+    if(!d.byVillage[vil]) d.byVillage[vil]={illegal:0,legal:0};
+    if(lt==='Illegal') d.byVillage[vil].illegal+=cnt;
+    if(lt==='Legal')   d.byVillage[vil].legal  +=cnt;
   });
 
-  setStatus(`${city.label} · cells…`);
-  const r4 = await qStat(city.svc,'1=1','cell,legal_t');
+  // zone_code × legal_t
+  const r4 = await qStat(city.svc,'1=1',`${F.ZONE},${F.LEGAL},${F.ZONING}`);
   r4.forEach(f => {
-    const cel = f.attributes.cell||'Unknown';
-    const lt  = f.attributes.legal_t||'Unknown';
+    const zc  = f.attributes[F.ZONE]||'Unknown';
+    const lt  = f.attributes[F.LEGAL]||'Unknown';
+    const zn  = f.attributes[F.ZONING]||'';
     const cnt = f.attributes.cnt||0;
-    if(!d.byCell[cel]) d.byCell[cel]={};
-    d.byCell[cel][lt] = (d.byCell[cel][lt]||0)+cnt;
+    if(!d.byZone[zc]) d.byZone[zc]={baseline:0,illegal:0,legal:0,label:zn};
+    if(lt==='Existing') d.byZone[zc].baseline+=cnt;
+    if(lt==='Illegal')  d.byZone[zc].illegal +=cnt;
+    if(lt==='Legal')    d.byZone[zc].label=zn, d.byZone[zc].legal+=cnt;
+    d.allZones.add(zc);
   });
 
-  setStatus(`${city.label} · villages…`);
-  const r5 = await qStat(city.svc,'1=1','village,legal_t');
+  // gen_lu × legal_t (new only)
+  const r5 = await qStat(city.svc,`${F.LEGAL}<>'Existing'`,`${F.GENLU},${F.LEGAL}`);
   r5.forEach(f => {
-    const vil = f.attributes.village||'Unknown';
-    const lt  = f.attributes.legal_t||'Unknown';
+    const lu  = f.attributes[F.GENLU]||'Unknown';
+    const lt  = f.attributes[F.LEGAL]||'Unknown';
     const cnt = f.attributes.cnt||0;
-    if(!d.byVillage[vil]) d.byVillage[vil]={};
-    d.byVillage[vil][lt] = (d.byVillage[vil][lt]||0)+cnt;
+    if(!d.byGenLu[lu]) d.byGenLu[lu]={illegal:0,legal:0};
+    if(lt==='Illegal') d.byGenLu[lu].illegal+=cnt;
+    if(lt==='Legal')   d.byGenLu[lu].legal  +=cnt;
   });
+
+  // Build raw rows for CSV
+  buildRawRows(city, d);
 
   d.loaded = true;
-  $(`badge_${city.id}`).textContent = fmtK(d.total);
+  $(`badge_${city.id}`).textContent = fmt(d.newTotal);
+  populateFilterDropdowns(city, d);
   renderCity(city);
   renderAllView();
   updateGlobalKpis();
 }
 
-// ══════════════════════════════════════════════════════════════
-//  RENDER — CITY
-// ══════════════════════════════════════════════════════════════
-function setCityYr(id, yr){
-  cityYr[id] = yr;
-  ['B','23','25'].forEach(s => {
-    const b = $(`yr${s}_${id}`);
-    if(b) b.classList.toggle('on',
-      (s==='B'&&yr==='both')||(s==='23'&&yr==='2023')||(s==='25'&&yr==='2025'));
+function buildRawRows(city, d){
+  d.rawRows = [];
+  // sector level
+  Object.entries(d.bySector).forEach(([sec, v]) => {
+    d.rawRows.push({
+      district: city.label,
+      level: 'Sector', name: sec,
+      baseline: v.baseline, new_total: v.illegal+v.legal,
+      illegal: v.illegal, legal: v.legal,
+      non_compliance_pct: pct(v.illegal, v.illegal+v.legal)
+    });
   });
-  renderCity(CITIES.find(c=>c.id===id));
 }
 
-function setAdm(id, lvl){
-  cityAdm[id] = lvl;
-  const bar = $(`lvl_${id}`);
-  if(bar) bar.querySelectorAll('.lvl-btn').forEach(b =>
-    b.classList.toggle('on', b.textContent.trim().toLowerCase() === lvl)
+function populateFilterDropdowns(city, d){
+  // Only populate when that city tab is active
+  // Global approach: merge all cities' options
+  const fSec = $('f_sector');
+  const fZone = $('f_zone');
+  const addOpt = (sel, val) => {
+    if(![...sel.options].some(o=>o.value===val)){
+      const o = document.createElement('option');
+      o.value = val; o.textContent = val;
+      sel.appendChild(o);
+    }
+  };
+  [...d.allSectors].sort().forEach(s => addOpt(fSec, s));
+  [...d.allZones].sort().forEach(z => addOpt(fZone, z));
+}
+
+// ══════════════════════════════════════════════════════════════
+//  FILTERS
+// ══════════════════════════════════════════════════════════════
+function applyFilters(){
+  activeFilters.sector = $('f_sector').value;
+  activeFilters.zone   = $('f_zone').value;
+  activeFilters.legal  = $('f_legal').value;
+  activeFilters.year   = $('f_year').value;
+  const active = Object.values(activeFilters).filter(Boolean).length;
+  $('filterCount').textContent = active ? `${active} filter${active>1?'s':''} active` : '';
+  // Re-render current view
+  if(currentCity === 'all') renderAllView();
+  else if(currentCity) {
+    const city = CITIES.find(c=>c.id===currentCity);
+    if(city) renderCity(city);
+  }
+  updateMapFilter();
+}
+
+function resetFilters(){
+  ['f_sector','f_zone','f_legal','f_year'].forEach(id => $(id).value='');
+  activeFilters = {sector:'',zone:'',legal:'',year:''};
+  $('filterCount').textContent = '';
+  if(currentCity === 'all') renderAllView();
+  else if(currentCity){
+    const city = CITIES.find(c=>c.id===currentCity);
+    if(city) renderCity(city);
+  }
+  updateMapFilter();
+}
+
+// Filter local data
+function filteredSectors(d){
+  return Object.entries(d.bySector).filter(([sec]) =>
+    !activeFilters.sector || sec === activeFilters.sector
   );
-  renderAdmBars(id);
+}
+function filteredCells(d){
+  return Object.entries(d.byCell).filter(([cel]) =>
+    !activeFilters.sector || true // cell doesn't have sector grouping in data
+  );
+}
+function filteredZones(d){
+  return Object.entries(d.byZone).filter(([zc]) =>
+    !activeFilters.zone || zc === activeFilters.zone
+  );
 }
 
-function getLegal(id, lt){
-  const d  = D[id];
-  const yr = cityYr[id];
-  if(yr === 'both') return d.byLegal[lt]||0;
-  return d.byLegalYear[yr]?.[lt]||0;
+function getFilteredTotals(d){
+  // Recompute totals respecting filters
+  let base=0, ill=0, leg=0;
+  filteredSectors(d).forEach(([,v]) => {
+    base += v.baseline;
+    const illVal = (!activeFilters.legal||activeFilters.legal==='Illegal') ? v.illegal : 0;
+    const legVal = (!activeFilters.legal||activeFilters.legal==='Legal')   ? v.legal   : 0;
+    const exVal  = (!activeFilters.legal||activeFilters.legal==='Existing')? v.baseline: 0;
+    if(!activeFilters.legal){ ill += v.illegal; leg += v.legal; }
+    else if(activeFilters.legal==='Illegal') ill += v.illegal;
+    else if(activeFilters.legal==='Legal')   leg += v.legal;
+  });
+  if(!activeFilters.sector){ base=d.baseline; }
+  if(!activeFilters.legal){ ill=d.illegal; leg=d.legal; }
+  return { base, ill, leg, newT: ill+leg };
 }
 
-function renderCity(city){
-  const id = city.id;
-  const d  = D[id];
-  if(!d.loaded) return;
-
-  const permit = getLegal(id, LK_PERMIT);
-  const ill    = getLegal(id, LK_ILLEGAL);
-  const tot    = permit + ill || 1;
-  const yr     = cityYr[id];
-  const secCnt = Object.keys(d.bySector).length;
-
-  $(`csub_${id}`).textContent = `${city.area.toUpperCase()} · ${secCnt} SECTORS · ${fmt(tot)} BUILDINGS · ${yr==='both'?'2023 & 2025':yr}`;
-
-  $(`kTot_${id}`).textContent     = fmtK(tot);
-  $(`kTotS_${id}`).textContent    = yr==='both'?'2023 & 2025':yr;
-  $(`kPermit_${id}`).textContent  = fmtK(permit);
-  $(`kPermitS_${id}`).textContent = `${pct(permit,tot)} of total`;
-  $(`kIll_${id}`).textContent     = fmtK(ill);
-  $(`kIllS_${id}`).textContent    = `${pct(ill,tot)} violations`;
-  $(`kRate_${id}`).textContent    = pct(permit, permit+ill);
-  $(`kRateS_${id}`).textContent   = `${fmt(permit)} of ${fmt(permit+ill)} assessed`;
-
-  $(`pmeta_${id}`).textContent = `${fmt(tot)} buildings`;
-  renderPermitBars(`pb23_${id}`, d.byLegalYear['2023']||{});
-  renderPermitBars(`pb25_${id}`, d.byLegalYear['2025']||{});
-  renderZoneBars(id);
-  renderAdmBars(id);
-}
-
-function renderPermitBars(cid, data){
-  const c = $(cid); if(!c) return;
-  const tot = LEGAL_KEYS.reduce((s,lt)=>s+(data[lt]||0),0)||1;
-  c.innerHTML = LEGAL_KEYS.map(lt => {
-    const cnt = data[lt]||0;
-    const w   = pctN(cnt, tot);
-    const col = LEGAL[lt]?.color||'#5a8aaa';
-    return `<div class="pbar-row">
-      <span class="pbar-lbl" style="color:${col};">${lt}</span>
-      <div class="pbar-track">
-        <div class="pbar-fill" style="width:${w}%;background:${col};">
-          <span class="pbar-cnt">${fmtK(cnt)}</span>
-        </div>
+// ══════════════════════════════════════════════════════════════
+//  RENDER HELPERS
+// ══════════════════════════════════════════════════════════════
+function barRow(label, val, maxVal, color, tooltip, extra=''){
+  const w = maxVal>0 ? Math.max(pctN(val,maxVal),0.5) : 0;
+  const div = document.createElement('div');
+  div.className = 'bar-row';
+  div.innerHTML = `
+    <span class="bar-lbl">${label}</span>
+    <div class="bar-track" style="position:relative">
+      <div class="bar-fill" style="width:${w}%;background:${color};height:100%;border-radius:2px;">
+        <span class="bar-inner-lbl">${val>0?fmt(val):''}</span>
       </div>
-      <span class="pbar-pct">${pct(cnt,tot)}</span>
-    </div>`;
-  }).join('');
+    </div>
+    <span class="bar-val" style="color:${color}">${fmt(val)}</span>
+    ${extra}`;
+  attachBarTip(div, tooltip);
+  return div;
 }
 
-function renderZoneBars(id){
-  const d  = D[id];
-  const zc = $(`zoneBars_${id}`);
-  const zt = $(`zoneTop_${id}`);
-  if(!zc||!zt) return;
-
-  const items    = Object.entries(d.byZoneIllegal).sort((a,b)=>b[1]-a[1]);
-  const totalIll = items.reduce((s,[,v])=>s+v,0)||1;
-  $(`zmeta_${id}`).textContent = `${items.length} zones · ${fmt(totalIll)} illegal`;
-
-  const max = items[0]?.[1]||1;
-  zc.innerHTML = items.slice(0,12).map(([zcode,cnt]) => {
-    const w  = pctN(cnt, max);
-    const pw = pctN(cnt, totalIll);
-    return `<div class="zbar-row">
-      <span class="zbar-code">${zcode}</span>
-      <div class="zbar-track">
-        <div class="zbar-fill" style="width:${w}%;">
-          <span class="zbar-cnt">${fmtK(cnt)}</span>
-        </div>
-      </div>
-      <span class="zbar-pct">${pw.toFixed(1)}%</span>
-    </div>`;
-  }).join('');
-
-  zt.innerHTML = items.slice(0,10).map(([zcode,cnt],i) => `
-    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--bd);">
-      <span style="font-family:var(--mono);font-size:8px;color:var(--ink3);width:18px;">${i+1}</span>
-      <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--rose);flex:1;">${zcode}</span>
-      <div style="width:80px;height:8px;background:var(--bg3);border-radius:2px;overflow:hidden;">
-        <div style="width:${pctN(cnt,max)}%;height:100%;background:#f06080cc;border-radius:2px;"></div>
-      </div>
-      <span style="font-family:var(--mono);font-size:9px;color:var(--ink2);width:44px;text-align:right;">${fmtK(cnt)}</span>
-    </div>`).join('');
-}
-
-function renderAdmBars(id){
-  const d   = D[id];
-  const el  = $(`admBars_${id}`); if(!el) return;
-  const lvl = cityAdm[id]||'sector';
-  const src = lvl==='sector'?d.bySector:lvl==='cell'?d.byCell:d.byVillage;
-
-  const items = Object.entries(src).map(([name,lts]) => {
-    const tot = Object.values(lts).reduce((s,v)=>s+v,0);
-    return { name, lts, tot };
-  }).sort((a,b)=>b.tot-a.tot);
-
-  const max = items[0]?.tot||1;
-  el.innerHTML = items.slice(0,30).map(({name,lts,tot}) => {
-    const permit  = lts[LK_PERMIT]||0;
-    const ill     = lts[LK_ILLEGAL]||0;
-    const wP      = pctN(permit, max);
-    const wI      = pctN(ill, max);
-    const illPct  = pctN(ill, permit+ill);
-    const illCol  = illPct>50?'var(--rose)':illPct>25?'var(--gold)':'var(--lime)';
-    return `<div class="adm-row">
-      <span class="adm-name" title="${name}">${name}</span>
-      <div class="adm-stacked">
-        <div class="adm-seg" style="width:${wP}%;background:#00d4b8cc;"></div>
-        <div class="adm-seg" style="width:${wI}%;background:#f06080cc;"></div>
-      </div>
-      <span class="adm-total">${fmtK(tot)}</span>
-      <span class="adm-illpct" style="color:${illCol};">${illPct.toFixed(0)}%</span>
-    </div>`;
-  }).join('');
+function stackedBarRow(label, illegal, legal, maxVal, color, tooltip){
+  const iW = maxVal>0 ? pctN(illegal,maxVal) : 0;
+  const lW = maxVal>0 ? pctN(legal,maxVal) : 0;
+  const div = document.createElement('div');
+  div.className = 'bar-row';
+  div.innerHTML = `
+    <span class="bar-lbl w130">${label}</span>
+    <div class="bar-stacked">
+      <div class="bar-seg" style="width:${lW}%;background:#00d4b8cc;" title="Legal: ${fmt(legal)}"></div>
+      <div class="bar-seg" style="width:${iW}%;background:#f06080cc;" title="Illegal: ${fmt(illegal)}"></div>
+    </div>
+    <span class="bar-pct">${fmt(illegal+legal)}</span>`;
+  attachBarTip(div, tooltip);
+  return div;
 }
 
 // ══════════════════════════════════════════════════════════════
 //  RENDER — ALL VIEW
 // ══════════════════════════════════════════════════════════════
-function setAllYr(yr){
-  allYr = yr;
-  document.querySelectorAll('#allYrBar .yr-btn').forEach(b =>
-    b.classList.toggle('on',
-      (b.textContent==='Both'&&yr==='both')||
-      (b.textContent==='2023'&&yr==='2023')||
-      (b.textContent==='2025'&&yr==='2025'))
-  );
-  renderAllView();
-}
-
-function getAll(city, lt){
-  const d = D[city.id];
-  if(allYr==='both') return d.byLegal[lt]||0;
-  return d.byLegalYear[allYr]?.[lt]||0;
-}
-
 function renderAllView(){
   renderOvCards();
   renderCmpBars();
@@ -853,180 +666,596 @@ function renderAllView(){
 }
 
 function renderOvCards(){
-  const c = $('ovGrid'); if(!c) return;
-  c.innerHTML = CITIES.map(city => {
-    const d      = D[city.id];
-    const permit = getAll(city, LK_PERMIT);
-    const ill    = getAll(city, LK_ILLEGAL);
-    const tot    = permit + ill || 1;
-    const rate   = pctN(permit, permit+ill);
-    const rateCol= rate>60?'var(--lime)':rate>30?'var(--gold)':'var(--rose)';
-    const secCnt = Object.keys(d.bySector).length;
-    return `<div class="ov-card" onclick="showTab('${city.id}')" style="border-top:2px solid ${city.color};">
-      <div class="ov-cname">${city.label}</div>
-      <div class="ov-cprov">${city.area.toUpperCase()} &nbsp;·&nbsp; ${secCnt} SECTORS</div>
-      <div class="ov-total" style="color:${city.color};">${fmtK(tot)}</div>
-      <div class="ov-total-lbl">BUILDINGS ANALYSED</div>
-      <div class="ov-bar-wrap">
-        <div class="ov-bar-hd">
-          <span class="ov-bar-name">Legal</span>
-          <span class="ov-bar-val" style="color:#00d4b8;">${fmtK(permit)}</span>
-        </div>
-        <div class="ov-bar-track">
-          <div class="ov-bar-fill" style="width:${pctN(permit,tot)}%;background:#00d4b8;"></div>
-        </div>
+  const el = $('ovGrid'); if(!el) return;
+  el.innerHTML = CITIES.map(dist => {
+    const d = D[dist.id];
+    const {ill, leg, newT} = getFilteredTotals(d);
+    const illPct = pctN(ill, newT);
+    const rCol = illPct>90?'var(--rose)':illPct>70?'var(--gold)':'var(--lime)';
+    return `<div class="ov-card" onclick="showTab('${dist.id}')" style="border-top-color:${dist.color}">
+      <div class="ov-name">${dist.label}</div>
+      <div class="ov-province">${dist.province.toUpperCase()}</div>
+      <div class="ov-big" style="color:${dist.color}">${fmt(newT)}</div>
+      <div class="ov-lbl">NEW DETECTIONS 2025</div>
+      <div class="ov-seg">
+        <div class="ov-seg-fill" style="width:${pctN(leg,newT)}%;background:var(--teal)"></div>
+        <div class="ov-seg-fill" style="width:${pctN(ill,newT)}%;background:var(--rose)"></div>
       </div>
-      <div class="ov-bar-wrap">
-        <div class="ov-bar-hd">
-          <span class="ov-bar-name">Illegal</span>
-          <span class="ov-bar-val" style="color:#f06080;">${fmtK(ill)}</span>
-        </div>
-        <div class="ov-bar-track">
-          <div class="ov-bar-fill" style="width:${pctN(ill,tot)}%;background:#f06080;"></div>
-        </div>
-      </div>
-      <div class="ov-divider"></div>
       <div class="ov-rate-row">
-        <span class="ov-rate-lbl">Compliance</span>
-        <span class="ov-rate-val" style="color:${rateCol};">${rate.toFixed(1)}%</span>
+        <span class="ov-rate-lbl">Non-Compliance</span>
+        <span class="ov-rate-val" style="color:${rCol}">${illPct.toFixed(1)}%</span>
       </div>
-      <div class="ov-link">View full analysis →</div>
     </div>`;
   }).join('');
 }
 
 function renderCmpBars(){
-  const c = $('cmpBars'); if(!c) return;
-  const items = CITIES.map(city => {
-    const p = getAll(city, LK_PERMIT);
-    const i = getAll(city, LK_ILLEGAL);
-    return { city, p, i, tot: p+i||1 };
-  }).sort((a,b)=>b.tot-a.tot);
-  const maxT = items[0]?.tot||1;
-  $('cmpMeta').textContent = allYr==='both'?'2023 & 2025':allYr;
-  c.innerHTML = items.map(({city,p,i,tot},idx) => `
-    <div class="cmp-row" onclick="showTab('${city.id}')">
-      <span class="cmp-rank">${idx+1}</span>
-      <span class="cmp-name" style="color:${city.color};">${city.label}</span>
-      <div class="cmp-stacked">
-        <div class="cmp-seg" style="width:${pctN(p,maxT)}%;background:#00d4b8cc;"></div>
-        <div class="cmp-seg" style="width:${pctN(i,maxT)}%;background:#f06080cc;"></div>
-      </div>
-      <span class="cmp-tot">${fmtK(tot)}</span>
-    </div>`).join('');
+  const el = $('cmpBars'); if(!el) return; el.innerHTML='';
+  const items = CITIES.map(d=>({dist:d,data:D[d.id]}))
+    .sort((a,b)=>b.data.newTotal-a.data.newTotal);
+  const maxN = items[0]?.data.newTotal||1;
+  items.forEach(({dist,data},i) => {
+    const row = stackedBarRow(
+      dist.label, data.illegal, data.legal, maxN,
+      dist.color,
+      `<b>${dist.label}</b><br>New: ${fmt(data.newTotal)}<br>Illegal: ${fmt(data.illegal)}<br>Legal: ${fmt(data.legal)}<br>Non-compliance: ${pct(data.illegal,data.newTotal)}`
+    );
+    row.querySelector('.bar-lbl').style.color = dist.color;
+    el.appendChild(row);
+  });
 }
 
 function renderRiskBars(){
-  const c = $('riskBars'); if(!c) return;
-  const items = CITIES.map(city => {
-    const p = getAll(city, LK_PERMIT);
-    const i = getAll(city, LK_ILLEGAL);
-    return { city, i, p, r: pctN(i, p+i) };
-  }).sort((a,b)=>b.r-a.r);
-  const maxR = items[0]?.r||1;
-  c.innerHTML = items.map(({city,r},idx) => {
-    const col = r>50?'var(--rose)':r>25?'var(--gold)':'var(--lime)';
-    return `<div class="risk-row" onclick="showTab('${city.id}')">
-      <span class="risk-rk">${idx+1}</span>
-      <span class="risk-name" style="color:${city.color};">${city.label}</span>
-      <div class="risk-track">
-        <div class="risk-fill" style="width:${(r/maxR*100).toFixed(1)}%;background:${col}cc;"></div>
-      </div>
-      <span class="risk-pct" style="color:${col};">${r.toFixed(1)}%</span>
-    </div>`;
-  }).join('');
+  const el = $('riskBars'); if(!el) return; el.innerHTML='';
+  const items = CITIES.map(d=>({dist:d,data:D[d.id]}))
+    .filter(x=>x.data.newTotal>0)
+    .sort((a,b)=>pctN(b.data.illegal,b.data.newTotal)-pctN(a.data.illegal,a.data.newTotal));
+  if(!items.length){ el.innerHTML='<div style="font-family:var(--mono);font-size:9px;color:var(--ink3);padding:20px 0">Loading…</div>'; return; }
+  const maxR = pctN(items[0].data.illegal,items[0].data.newTotal)||1;
+  items.forEach(({dist,data}) => {
+    const r = pctN(data.illegal,data.newTotal);
+    const col = r>90?'var(--rose)':r>70?'var(--gold)':'var(--lime)';
+    const row = barRow(dist.label, Math.round(r*10)/10, maxR, col,
+      `<b>${dist.label}</b><br>Non-compliance: ${r.toFixed(1)}%<br>Illegal: ${fmt(data.illegal)} of ${fmt(data.newTotal)}`);
+    row.querySelector('.bar-val').textContent = r.toFixed(1)+'%';
+    row.querySelector('.bar-lbl').style.color = dist.color;
+    el.appendChild(row);
+  });
 }
 
 function updateGlobalKpis(){
-  let tot=0, permit=0, ill=0;
-  CITIES.forEach(c => {
-    tot    += D[c.id].total||0;
-    permit += D[c.id].byLegal[LK_PERMIT]||0;
-    ill    += D[c.id].byLegal[LK_ILLEGAL]||0;
-  });
-  const rate = pctN(permit, permit+ill);
-  $('g_total').textContent   = fmtK(tot);
-  $('g_legal').textContent   = fmtK(permit);
-  $('g_illegal').textContent = fmtK(ill);
-  $('g_rate').textContent    = rate.toFixed(1)+'%';
-  $('g_rate_sub').textContent = `${fmt(permit)} of ${fmt(permit+ill)}`;
-}
-
-function setStatus(txt){
-  const b = $('sbar');
-  if(txt){ b.classList.remove('gone'); $('stxt').textContent = txt.toUpperCase(); }
-  else b.classList.add('gone');
+  let base=0,newT=0,ill=0,leg=0;
+  CITIES.forEach(c=>{base+=D[c.id].baseline;newT+=D[c.id].newTotal;ill+=D[c.id].illegal;leg+=D[c.id].legal;});
+  $('g_base').textContent = fmt(base);
+  $('g_new').textContent  = fmt(newT);
+  $('g_ill').textContent  = fmt(ill);
+  $('g_rate').textContent = newT>0 ? pctN(ill,newT).toFixed(1)+'%':'—';
 }
 
 // ══════════════════════════════════════════════════════════════
-//  ARCGIS
+//  RENDER — CITY
+// ══════════════════════════════════════════════════════════════
+function renderCity(city){
+  const d = D[city.id];
+  if(!d.loaded) return;
+  const {base, ill, leg, newT} = getFilteredTotals(d);
+  const illR = pctN(ill,newT);
+  const rCol = illR>90?'var(--rose)':illR>70?'var(--gold)':'var(--lime)';
+  const secCount = filteredSectors(d).filter(([,v])=>v.baseline>0||v.illegal+v.legal>0).length;
+
+  // Sub
+  $(`csub_${city.id}`).textContent =
+    `${city.province.toUpperCase()} · ${secCount} URBANIZED SECTOR${secCount!==1?'S':''} · ${fmt(base)} BASELINE · ${fmt(newT)} NEW 2025`;
+
+  // KPIs
+  $(`kBaseline_${city.id}`).textContent = fmt(base);
+  $(`kNew_${city.id}`).textContent      = fmt(newT);
+  $(`kIll_${city.id}`).textContent      = fmt(ill);
+  $(`kLeg_${city.id}`).textContent      = fmt(leg);
+  $(`kRate_${city.id}`).textContent     = newT>0?illR.toFixed(1)+'%':'—';
+  $(`kRate_${city.id}`).style.color     = rCol;
+
+  renderSectorChange(city, d);
+  renderZoneTable(city, d);
+  renderCellBars(city, d);
+  renderVillageBars(city, d);
+  renderLuBars(city, d);
+  buildDownloadTable(city, d);
+  updateCityMap(city);
+}
+
+function renderSectorChange(city, d){
+  const el = $(`secChange_${city.id}`); if(!el) return;
+  const secs = filteredSectors(d)
+    .filter(([,v])=>v.baseline>0||v.illegal+v.legal>0)
+    .sort((a,b)=>(b[1].illegal+b[1].legal)-(a[1].illegal+a[1].legal));
+  if(!secs.length){el.innerHTML='<div style="font-family:var(--mono);font-size:9px;color:var(--ink3);">No sectors match filters</div>';return;}
+
+  const maxBase = Math.max(...secs.map(([,v])=>v.baseline))||1;
+  const maxNew  = Math.max(...secs.map(([,v])=>v.illegal+v.legal))||1;
+  const maxAll  = Math.max(maxBase,maxNew);
+
+  // Summary header
+  const totalBase = secs.reduce((s,[,v])=>s+v.baseline,0);
+  const totalIll  = secs.reduce((s,[,v])=>s+v.illegal,0);
+  const totalLeg  = secs.reduce((s,[,v])=>s+v.legal,0);
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bd);border:1px solid var(--bd);border-radius:3px;overflow:hidden;margin-bottom:16px;">
+      <div style="background:var(--bg2);padding:14px 16px;">
+        <div style="font-family:var(--mono);font-size:7px;letter-spacing:2px;color:var(--ink3);text-transform:uppercase;margin-bottom:6px;">Baseline 2023</div>
+        <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--sky);">${fmt(totalBase)}</div>
+        <div style="font-family:var(--mono);font-size:7px;color:var(--ink3);margin-top:4px;">Existing buildings</div>
+      </div>
+      <div style="background:var(--bg2);padding:14px 16px;">
+        <div style="font-family:var(--mono);font-size:7px;letter-spacing:2px;color:var(--ink3);text-transform:uppercase;margin-bottom:6px;">New 2025</div>
+        <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--violet);">${fmt(totalIll+totalLeg)}</div>
+        <div style="font-family:var(--mono);font-size:7px;color:var(--ink3);margin-top:4px;">New constructions</div>
+      </div>
+      <div style="background:var(--bg2);padding:14px 16px;">
+        <div style="font-family:var(--mono);font-size:7px;letter-spacing:2px;color:var(--ink3);text-transform:uppercase;margin-bottom:6px;">Without Permit</div>
+        <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--rose);">${fmt(totalIll)}</div>
+        <div style="font-family:var(--mono);font-size:7px;color:var(--ink3);margin-top:4px;">${pct(totalIll,totalIll+totalLeg)} of new builds</div>
+      </div>
+      <div style="background:var(--bg2);padding:14px 16px;">
+        <div style="font-family:var(--mono);font-size:7px;letter-spacing:2px;color:var(--ink3);text-transform:uppercase;margin-bottom:6px;">With Permit</div>
+        <div style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--lime);">${fmt(totalLeg)}</div>
+        <div style="font-family:var(--mono);font-size:7px;color:var(--ink3);margin-top:4px;">${pct(totalLeg,totalIll+totalLeg)} of new builds</div>
+      </div>
+    </div>
+    ${secs.map(([sec,v])=>{
+      const newT = v.illegal+v.legal;
+      const illR = pctN(v.illegal,newT);
+      const rCol = illR>90?'var(--rose)':illR>70?'var(--gold)':'var(--lime)';
+      const bW = pctN(v.baseline,maxAll);
+      const iW = pctN(v.illegal,maxAll);
+      const lW = pctN(v.legal,maxAll);
+      return `<div style="padding:12px 0;border-bottom:1px solid var(--bd);">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+          <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink);">${sec}</span>
+          <span style="font-family:var(--mono);font-size:8px;font-weight:700;color:${rCol};">${illR.toFixed(1)}% non-compliant</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="font-family:var(--mono);font-size:7px;color:var(--sky);width:68px;letter-spacing:1px;flex-shrink:0;">BASELINE</span>
+          <div style="flex:1;height:9px;background:var(--bg3);border-radius:2px;overflow:hidden;">
+            <div style="width:${bW}%;height:100%;background:#254460;border-radius:2px;"></div>
+          </div>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--sky);width:70px;text-align:right;flex-shrink:0;">${fmt(v.baseline)}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="font-family:var(--mono);font-size:7px;color:var(--rose);width:68px;letter-spacing:1px;flex-shrink:0;">ILLEGAL</span>
+          <div style="flex:1;height:9px;background:var(--bg3);border-radius:2px;overflow:hidden;">
+            <div style="width:${iW}%;height:100%;background:#f06080cc;border-radius:2px;"></div>
+          </div>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--rose);width:70px;text-align:right;flex-shrink:0;">${fmt(v.illegal)}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-family:var(--mono);font-size:7px;color:var(--lime);width:68px;letter-spacing:1px;flex-shrink:0;">LEGAL</span>
+          <div style="flex:1;height:9px;background:var(--bg3);border-radius:2px;overflow:hidden;">
+            <div style="width:${lW}%;height:100%;background:#78d890cc;border-radius:2px;"></div>
+          </div>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--lime);width:70px;text-align:right;flex-shrink:0;">${fmt(v.legal)}</span>
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+
+function renderZoneTable(city, d){
+  const tbody = $(`zoneBody_${city.id}`); if(!tbody) return;
+  const rows = filteredZones(d)
+    .map(([zc,v])=>{const newT=v.illegal+v.legal;return{zc,...v,newT,illR:pctN(v.illegal,newT)};})
+    .filter(r=>r.newT>0)
+    .sort((a,b)=>b.illegal-a.illegal);
+  $(`zoneMeta_${city.id}`).textContent = `${rows.length} zones with new construction`;
+  const maxIll = rows[0]?.illegal||1;
+  tbody.innerHTML = rows.map(r=>{
+    const rCls = r.illR>80?'var(--rose)':r.illR>50?'var(--gold)':'var(--lime)';
+    const bW   = pctN(r.illegal,maxIll);
+    const zLabel = (r.label||'').split('-').slice(1).join('-').trim();
+    return `<tr>
+      <td><span class="zone-code">${r.zc}</span></td>
+      <td style="text-align:left;font-size:8px;color:var(--ink3);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${r.label||''}">${zLabel||r.label||'—'}</td>
+      <td>${fmt(r.baseline)}</td>
+      <td>${fmt(r.newT)}</td>
+      <td style="color:var(--rose)">${fmt(r.illegal)}</td>
+      <td style="color:var(--lime)">${fmt(r.legal)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
+          <div style="width:50px;height:7px;background:var(--bg3);border-radius:2px;overflow:hidden;">
+            <div style="width:${bW}%;height:100%;background:#f06080cc;border-radius:2px;"></div>
+          </div>
+          <span style="color:${rCls};font-weight:700;font-family:var(--mono);font-size:9px;">${r.illR.toFixed(1)}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderCellBars(city, d){
+  const el = $(`cellBars_${city.id}`); if(!el) return; el.innerHTML='';
+  const items = filteredCells(d)
+    .map(([cel,v])=>({cel,...v,newT:v.illegal+v.legal}))
+    .filter(r=>r.newT>0||r.baseline>0)
+    .sort((a,b)=>b.newT-a.newT);
+  const maxN = Math.max(...items.map(r=>r.illegal))||1;
+  $(`cellMeta_${city.id}`).textContent = `${items.length} cells`;
+  items.forEach(({cel,baseline,illegal,legal,newT})=>{
+    const row = stackedBarRow(
+      cel, illegal, legal, Math.max(maxN,1), 'var(--sky)',
+      `<b>${cel}</b><br>Baseline: ${fmt(baseline)}<br>New 2025: ${fmt(newT)}<br>Illegal: ${fmt(illegal)}<br>Legal: ${fmt(legal)}<br>Non-compliance: ${pct(illegal,newT)}`
+    );
+    el.appendChild(row);
+  });
+}
+
+function renderVillageBars(city, d){
+  const el = $(`vilBars_${city.id}`); if(!el) return; el.innerHTML='';
+  const items = Object.entries(d.byVillage)
+    .map(([vil,v])=>({vil,...v,total:v.illegal+v.legal}))
+    .filter(r=>r.illegal>0)
+    .sort((a,b)=>b.illegal-a.illegal);
+  const maxI = items[0]?.illegal||1;
+  $(`vilMeta_${city.id}`).textContent = `${items.length} villages with illegal constructions`;
+  items.slice(0,30).forEach(({vil,illegal,legal,total})=>{
+    const row = barRow(
+      vil, illegal, maxI, 'var(--rose)',
+      `<b>${vil}</b><br>Illegal: ${fmt(illegal)}<br>Legal: ${fmt(legal)}<br>Non-compliance: ${pct(illegal,total)}`,
+      `<span class="bar-pct">${pct(illegal,total)}</span>`
+    );
+    el.appendChild(row);
+  });
+}
+
+function renderLuBars(city, d){
+  const el = $(`luBars_${city.id}`); if(!el) return; el.innerHTML='';
+  const items = Object.entries(d.byGenLu)
+    .map(([lu,v])=>({lu,...v,total:v.illegal+v.legal}))
+    .filter(r=>r.total>0)
+    .sort((a,b)=>b.illegal-a.illegal);
+  const maxN = Math.max(...items.map(r=>r.illegal))||1;
+  items.forEach(({lu,illegal,legal,total})=>{
+    const row = stackedBarRow(lu,illegal,legal,maxN,'var(--teal)',
+      `<b>${lu}</b><br>Illegal: ${fmt(illegal)}<br>Legal: ${fmt(legal)}<br>Non-compliance: ${pct(illegal,total)}`);
+    el.appendChild(row);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CSV DOWNLOAD TABLE
+// ══════════════════════════════════════════════════════════════
+function buildDownloadTable(city, d){
+  const tbody = $(`dlBody_${city.id}`); if(!tbody) return;
+
+  // Build full flat rows: zone × sector × legal_t type summary
+  const rows = [];
+  filteredZones(d).forEach(([zc,zv])=>{
+    const newT = zv.illegal+zv.legal;
+    if(newT===0&&zv.baseline===0) return;
+    rows.push({
+      District: city.label, Province: city.province,
+      'Zone Code': zc,
+      'Zone Type': (zv.label||'').split('-').slice(1).join('-').trim()||zv.label||'',
+      'Baseline 2023': zv.baseline,
+      'New 2025': newT,
+      'Without Permit (Illegal)': zv.illegal,
+      'With Permit (Legal)': zv.legal,
+      'Non-Compliance %': newT>0?(zv.illegal/newT*100).toFixed(1)+'%':'—',
+    });
+  });
+
+  $(`dlCount_${city.id}`).textContent = `${rows.length} rows`;
+
+  tbody.innerHTML = rows.map(r=>`<tr>
+    <td>${r.District}</td>
+    <td>${r['Zone Code']}</td>
+    <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r['Zone Type']}</td>
+    <td style="text-align:right">${fmt(r['Baseline 2023'])}</td>
+    <td style="text-align:right">${fmt(r['New 2025'])}</td>
+    <td style="text-align:right;color:var(--rose)">${fmt(r['Without Permit (Illegal)'])}</td>
+    <td style="text-align:right;color:var(--lime)">${fmt(r['With Permit (Legal)'])}</td>
+    <td style="text-align:right">${r['Non-Compliance %']}</td>
+  </tr>`).join('');
+
+  // Store for download
+  d.dlRows = rows;
+}
+
+function downloadCSV(cityId){
+  const d = D[cityId];
+  if(!d||!d.dlRows||!d.dlRows.length){alert('No data yet');return;}
+  const cols = Object.keys(d.dlRows[0]);
+  const csv = [cols.join(','),
+    ...d.dlRows.map(r=>cols.map(c=>`"${String(r[c]).replace(/"/g,'""')}"`).join(','))
+  ].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  const city = CITIES.find(c=>c.id===cityId);
+  a.download = `${city?.label||cityId}_change_detection_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  ARCGIS MAPS
 // ══════════════════════════════════════════════════════════════
 let arcReady = false;
-const mapInst = {};
+const mapViews = {};
+const mapLayers = {};
 
 function loadArcGIS(cb){
-  if(arcReady){ cb(); return; }
-  const lnk = document.createElement('link');
-  lnk.rel = 'stylesheet';
-  lnk.href = 'https://js.arcgis.com/4.29/esri/themes/dark/main.css';
+  if(arcReady){cb();return;}
+  const lnk=document.createElement('link');lnk.rel='stylesheet';
+  lnk.href='https://js.arcgis.com/4.29/esri/themes/dark/main.css';
   document.head.appendChild(lnk);
-  const s = document.createElement('script');
-  s.src = 'https://js.arcgis.com/4.29/';
-  s.onload = () => setTimeout(() => { arcReady = true; cb(); }, 200);
+  const s=document.createElement('script');s.src='https://js.arcgis.com/4.29/';
+  s.onload=()=>setTimeout(()=>{arcReady=true;cb();},200);
   document.head.appendChild(s);
 }
 
 const permitRenderer = {
-  type: 'unique-value', field: 'legal_t',
-  defaultSymbol: { type:'simple-fill', color:[42,69,96,160], outline:{color:[255,255,255,20],width:.2} },
-  uniqueValueInfos: [
-    { value:'Legal',   symbol:{ type:'simple-fill', color:'#00d4b8bb', outline:{color:'#00d4b8',width:.6} } },
-    { value:'Illegal', symbol:{ type:'simple-fill', color:'#f06080bb', outline:{color:'#f06080',width:.6} } },
+  type:'unique-value', field:'legal_t',
+  defaultSymbol:{type:'simple-fill',color:[42,69,96,140],outline:{color:[255,255,255,15],width:.2}},
+  uniqueValueInfos:[
+    {value:'Legal',    symbol:{type:'simple-fill',color:'#00d4b8bb',outline:{color:'#00d4b8',width:.7}}},
+    {value:'Illegal',  symbol:{type:'simple-fill',color:'#f06080bb',outline:{color:'#f06080',width:.7}}},
+    {value:'Existing', symbol:{type:'simple-fill',color:'#1e3a5488',outline:{color:'#254460',width:.3}}},
   ]
 };
 
 const popupTpl = {
-  title: '{legal_t}',
-  content: '<b>Zone:</b> {zone_code}<br><b>District:</b> {district}<br><b>Sector:</b> {sector}<br><b>Cell:</b> {cell}<br><b>Village:</b> {village}<br><b>Year:</b> {year_t}<br><b>UPI:</b> {upi}'
+  title:'{legal_t} — {status_t}',
+  content:'<b>Zone:</b> {zone_code} — {zoning}<br><b>Land Use:</b> {gen_lu}<br><b>Sector:</b> {sector}<br><b>Cell:</b> {cell}<br><b>Village:</b> {village}<br><b>Year:</b> {year_t}<br><b>UPI:</b> {upi}<br><b>Size:</b> {size} m²'
 };
 
-function initAllMap(){
-  loadArcGIS(() => {
-    require(['esri/WebMap','esri/views/MapView','esri/layers/FeatureLayer','esri/widgets/Home','esri/widgets/Legend','esri/widgets/Expand'],
-    function(WebMap,MapView,FeatureLayer,Home,Legend,Expand){
-      const layers = CITIES.map(c => new FeatureLayer({ url:c.svc, renderer:permitRenderer, popupTemplate:popupTpl, title:c.label }));
-      const wm = new WebMap({ portalItem:{ id:WEBMAP_ID } });
-      layers.forEach(l => wm.add(l));
-      const view = new MapView({ container:'allMapDiv', map:wm, center:[29.87,-1.94], zoom:8, ui:{components:['zoom','attribution']} });
-      view.ui.add(new Home({view}), 'top-left');
-      view.ui.add(new Expand({ view, content:new Legend({view}), expandIcon:'legend', expanded:false }), 'bottom-left');
-      view.when(() => { $('allMapHint').textContent = 'Click any building to view permit status — all 7 urban areas'; });
+function initCityMap(id){
+  if(mapViews[id]) return;
+  mapViews[id] = 'loading';
+  const city = CITIES.find(c=>c.id===id); if(!city) return;
+  loadArcGIS(()=>{
+    require(['esri/WebMap','esri/views/MapView','esri/layers/FeatureLayer',
+             'esri/widgets/Home','esri/widgets/Search','esri/widgets/Legend',
+             'esri/widgets/Expand','esri/widgets/ScaleBar'],
+    function(WebMap,MapView,FeatureLayer,Home,Search,Legend,Expand,ScaleBar){
+      const layer = new FeatureLayer({url:city.svc,renderer:permitRenderer,popupTemplate:popupTpl,
+        title:`${city.label} — Construction Status`});
+      mapLayers[id] = layer;
+      const wm = new WebMap({portalItem:{id:WEBMAP_ID}});
+      wm.add(layer);
+      const view = new MapView({container:`mapDiv_${id}`,map:wm,zoom:13,
+        ui:{components:['zoom','attribution']},
+        popup:{dockEnabled:true,dockOptions:{position:'bottom-right',breakpoint:false}}});
+      view.ui.add(new Home({view}),'top-left');
+      view.ui.add(new Search({view}),'top-right');
+      view.ui.add(new ScaleBar({view,unit:'metric'}),'bottom-right');
+      view.ui.add(new Expand({view,content:new Legend({view,layerInfos:[{layer,title:'Permit Status'}]}),
+        expandIcon:'legend',expanded:true}),'bottom-left');
+      view.when(()=>{
+        $(`mhint_${id}`).textContent=`${city.label} · click a building for zone, UPI, sector details`;
+        mapViews[id]=view;
+        applyMapFilter(id);
+      });
     });
   });
 }
 
-function initCityMap(id){
-  if(mapInst[id]) return;
-  mapInst[id] = true;
-  const city = CITIES.find(c=>c.id===id); if(!city) return;
-  loadArcGIS(() => {
-    require(['esri/WebMap','esri/views/MapView','esri/layers/FeatureLayer','esri/widgets/Home','esri/widgets/Search','esri/widgets/Legend','esri/widgets/Expand','esri/widgets/ScaleBar'],
-    function(WebMap,MapView,FeatureLayer,Home,Search,Legend,Expand,ScaleBar){
-      const layer = new FeatureLayer({ url:city.svc, renderer:permitRenderer, popupTemplate:popupTpl, title:`${city.label} Buildings` });
-      const wm = new WebMap({ portalItem:{ id:WEBMAP_ID } });
-      wm.add(layer);
-      const view = new MapView({
-        container: `mapDiv_${id}`, map:wm, zoom:13,
-        ui: { components:['zoom','attribution'] },
-        popup: { dockEnabled:true, dockOptions:{ position:'bottom-right', breakpoint:false } }
-      });
-      view.ui.add(new Home({view}), 'top-left');
-      view.ui.add(new Search({view}), 'top-right');
-      view.ui.add(new ScaleBar({ view, unit:'metric' }), 'bottom-right');
-      view.ui.add(new Expand({ view, content:new Legend({ view, layerInfos:[{layer, title:'Permit Status'}] }), expandIcon:'legend', expanded:true }), 'bottom-left');
-      view.when(() => $(`mhint_${id}`).textContent = `${city.label} — click a building for zone, sector, cell and village details`);
-    });
+function applyMapFilter(id){
+  if(!mapLayers[id]||mapViews[id]==='loading') return;
+  const parts=[];
+  if(activeFilters.sector) parts.push(`${F.SECTOR}='${activeFilters.sector.replace(/'/g,"''")}'`);
+  if(activeFilters.zone)   parts.push(`${F.ZONE}='${activeFilters.zone}'`);
+  if(activeFilters.legal)  parts.push(`${F.LEGAL}='${activeFilters.legal}'`);
+  if(activeFilters.year)   parts.push(`${F.YEAR}='${activeFilters.year}'`);
+  mapLayers[id].definitionExpression = parts.length ? parts.join(' AND ') : '1=1';
+}
+
+function updateMapFilter(){
+  CITIES.forEach(c=>{ if(mapLayers[c.id]) applyMapFilter(c.id); });
+}
+
+function updateCityMap(city){
+  if(mapLayers[city.id]) applyMapFilter(city.id);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  BUILD DOM
+// ══════════════════════════════════════════════════════════════
+function buildTabs(){
+  const bar=$('tabBar');
+  CITIES.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='tab';btn.id=`tab_${c.id}`;
+    btn.onclick=()=>showTab(c.id);
+    btn.innerHTML=`<span class="tab-dot" style="background:${c.color}"></span>${c.label}<span class="tbadge" id="badge_${c.id}">—</span>`;
+    bar.appendChild(btn);
   });
+}
+
+function buildCityViews(){
+  const container=$('cityViews');
+  CITIES.forEach(c=>{
+    const div=document.createElement('div');
+    div.className='city-view';div.id=`view_${c.id}`;
+    div.innerHTML=`
+      <!-- PAGE HEADER -->
+      <div class="page-hd">
+        <div>
+          <div class="page-title">${c.label}</div>
+          <div class="page-sub" id="csub_${c.id}">${c.province.toUpperCase()} · LOADING…</div>
+        </div>
+      </div>
+
+      <!-- SCOPE NOTICE -->
+      <div class="context-notice">
+        SCOPE — This view covers only the <strong>urbanized sectors</strong> within ${c.label} district where 2025 satellite imagery was acquired.
+        Baseline = 2023 existing buildings in those sectors. New = 2025 new detections cross-referenced with building permits.
+      </div>
+
+      <!-- KPI STRIP -->
+      <div class="kpi-row">
+        <div class="kcard k-sky">
+          <div class="kcard-lbl">Baseline 2023</div>
+          <div class="kcard-val" style="color:var(--sky)" id="kBaseline_${c.id}">—</div>
+          <div class="kcard-sub">Existing in urbanized sectors</div>
+        </div>
+        <div class="kcard k-violet">
+          <div class="kcard-lbl">New Detections 2025</div>
+          <div class="kcard-val" style="color:var(--violet)" id="kNew_${c.id}">—</div>
+          <div class="kcard-sub">New constructions found</div>
+        </div>
+        <div class="kcard k-rose">
+          <div class="kcard-lbl">Without Permit</div>
+          <div class="kcard-val" style="color:var(--rose)" id="kIll_${c.id}">—</div>
+          <div class="kcard-sub">Illegal new constructions</div>
+        </div>
+        <div class="kcard k-lime">
+          <div class="kcard-lbl">With Permit</div>
+          <div class="kcard-val" style="color:var(--lime)" id="kLeg_${c.id}">—</div>
+          <div class="kcard-sub">Compliant new builds</div>
+        </div>
+        <div class="kcard k-gold">
+          <div class="kcard-lbl">Non-Compliance Rate</div>
+          <div class="kcard-val" id="kRate_${c.id}">—</div>
+          <div class="kcard-sub">of 2025 new detections</div>
+        </div>
+      </div>
+
+      <!-- SECTOR CHANGE DETECTION -->
+      <div class="sec-hd">
+        Urban Sector Change Detection — 2023 Baseline vs 2025 New Constructions
+        <span class="sec-hd-meta" id="secMeta_${c.id}"></span>
+      </div>
+      <div class="card mb24">
+        <div class="card-body" id="secChange_${c.id}">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--ink3);">Loading…</div>
+        </div>
+      </div>
+
+      <!-- MAP -->
+      <div class="sec-hd">
+        ArcGIS Feature Map — Permit Status by Building
+        <span class="sec-hd-meta">Filters applied to map in real-time</span>
+      </div>
+      <div class="card mb24">
+        <div class="card-hd">
+          <div class="card-title">${c.label} — Building Permit Status Map</div>
+          <div style="display:flex;gap:16px;align-items:center;">
+            <span class="map-key"><span class="map-swatch" style="background:#1e3a54"></span>Existing 2023</span>
+            <span class="map-key"><span class="map-swatch" style="background:#f06080"></span>Illegal</span>
+            <span class="map-key"><span class="map-swatch" style="background:#00d4b8"></span>Legal</span>
+          </div>
+        </div>
+        <div class="map-div" id="mapDiv_${c.id}"></div>
+        <div class="map-legend-bar">
+          <span class="map-hint" id="mhint_${c.id}">Map loading…</span>
+        </div>
+      </div>
+
+      <!-- ZONE ANALYSIS -->
+      <div class="sec-hd">
+        Zone Code Analysis — New Constructions vs Permit Status
+        <span class="sec-hd-meta" id="zoneMeta_${c.id}"></span>
+      </div>
+      <div class="card mb24">
+        <div style="overflow:auto;max-height:380px;">
+          <table class="zone-tbl" style="min-width:620px;">
+            <thead>
+              <tr>
+                <th style="text-align:left">Zone</th>
+                <th style="text-align:left">Type</th>
+                <th>Baseline</th>
+                <th>New 2025</th>
+                <th>Illegal</th>
+                <th>Legal</th>
+                <th style="text-align:left;padding-left:10px;">Rate</th>
+              </tr>
+            </thead>
+            <tbody id="zoneBody_${c.id}"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CELLS + VILLAGES -->
+      <div class="sec-hd">Cells &amp; Villages — Illegal Constructions Breakdown</div>
+      <div class="g2 mb24">
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title">By Cell — Legal vs Illegal</div>
+            <div class="card-meta" id="cellMeta_${c.id}">—</div>
+          </div>
+          <div class="card-body scroll-box" id="cellBars_${c.id}"></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title">Top Villages — Illegal Constructions</div>
+            <div class="card-meta" id="vilMeta_${c.id}">—</div>
+          </div>
+          <div class="card-body scroll-box" id="vilBars_${c.id}"></div>
+        </div>
+      </div>
+
+      <!-- LAND USE -->
+      <div class="sec-hd">Land Use — New Construction by Gen LU Category</div>
+      <div class="card mb24">
+        <div class="card-hd">
+          <div class="card-title">Legal (teal) vs Illegal (red) by Land Use</div>
+          <div class="card-meta">New 2025 detections only</div>
+        </div>
+        <div class="card-body" id="luBars_${c.id}"></div>
+      </div>
+
+      <!-- DATA DOWNLOAD TABLE -->
+      <div class="sec-hd">
+        Data Export — Zone-Level Summary
+        <span class="sec-hd-meta" id="dlCount_${c.id}"></span>
+      </div>
+      <div class="card mb24">
+        <div class="card-hd">
+          <div class="card-title">Zone × Permit Status Summary Table</div>
+          <button class="dl-btn" onclick="downloadCSV('${c.id}')">Download CSV</button>
+        </div>
+        <div class="dl-table-wrap">
+          <table class="dl-table">
+            <thead>
+              <tr>
+                <th>District</th>
+                <th>Zone Code</th>
+                <th>Zone Type</th>
+                <th style="text-align:right">Baseline 2023</th>
+                <th style="text-align:right">New 2025</th>
+                <th style="text-align:right">Illegal</th>
+                <th style="text-align:right">Legal</th>
+                <th style="text-align:right">Rate %</th>
+              </tr>
+            </thead>
+            <tbody id="dlBody_${c.id}"></tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════════════
+function showTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.city-view').forEach(v=>v.classList.remove('on'));
+  $(`tab_${id}`)?.classList.add('on');
+  $(`view_${id}`)?.classList.add('on');
+  currentCity = id;
+  if(id!=='all') initCityMap(id);
+  // Update filter dropdowns to match city context
+  if(id!=='all'){
+    const d = D[id];
+    if(d?.loaded) populateFilterDropdowns({id},d);
+  }
+}
+
+function setStatus(txt){
+  const b=$('sbar');
+  if(txt){b.classList.remove('gone');$('stxt').textContent=txt.toUpperCase();}
+  else b.classList.add('gone');
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1034,10 +1263,12 @@ function initCityMap(id){
 // ══════════════════════════════════════════════════════════════
 buildTabs();
 buildCityViews();
+currentCity = 'all';
 renderAllView();
-Promise.all(CITIES.map(c => loadCity(c))).then(() => setStatus(null)).catch(() => setStatus(null));
-initAllMap();
-window.addEventListener('resize', () => renderAllView());
+
+Promise.all(CITIES.map(c=>loadCity(c)))
+  .then(()=>setStatus(null))
+  .catch(()=>setStatus(null));
 </script>
 </body>
 </html>
