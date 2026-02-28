@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NLA · Urban Change Detection Intelligence</title>
+<title>Building Monitoring Application</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -123,7 +123,7 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sa
 
 /* ── TOOLTIP ── */
 .tooltip-wrap{position:relative}
-.tooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--bd2);border-radius:3px;padding:6px 10px;font-family:var(--mono);font-size:8px;color:var(--ink);white-space:nowrap;z-index:500;pointer-events:none;line-height:1.6}
+.tooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--bd2);border-radius:3px;padding:6px 10px;font-family:var(--mono);font-size:9px;color:var(--ink);white-space:nowrap;z-index:500;pointer-events:none;line-height:1.6}
 .tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--bd2)}
 .tooltip-wrap:hover .tooltip{display:block}
 
@@ -219,7 +219,7 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sa
 <!-- MASTHEAD -->
 <div class="masthead">
   <div class="mh-left">
-    <div class="mh-title">NLA · Urban Construction <span>Intelligence</span></div>
+    <div class="mh-title">Building <span>Monitoring Application</span></div>
     <div class="mh-sub">CHANGE DETECTION 2023 → 2025 · URBANIZED SECTORS ONLY</div>
   </div>
   <div class="gkpi-row">
@@ -250,23 +250,45 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sa
 <div class="filter-bar">
   <div class="filter-lbl">Filters</div>
   <div class="filter-sep"></div>
+
   <div class="fsel-wrap">
     <div class="fsel-name">SECTOR</div>
-    <select class="fsel" id="f_sector" onchange="applyFilters()"><option value="">All Sectors</option></select>
+    <select class="fsel" id="f_sector" onchange="applyFilters()">
+      <option value="">All Sectors</option>
+    </select>
   </div>
+
+  <div class="fsel-wrap">
+    <div class="fsel-name">CELL</div>
+    <select class="fsel" id="f_cell" onchange="applyFilters()">
+      <option value="">All Cells</option>
+    </select>
+  </div>
+
+  <div class="fsel-wrap">
+    <div class="fsel-name">VILLAGE</div>
+    <select class="fsel" id="f_village" onchange="applyFilters()">
+      <option value="">All Villages</option>
+    </select>
+  </div>
+
   <div class="fsel-wrap">
     <div class="fsel-name">ZONE</div>
-    <select class="fsel" id="f_zone" onchange="applyFilters()"><option value="">All Zones</option></select>
+    <select class="fsel" id="f_zone" onchange="applyFilters()">
+      <option value="">All Zones</option>
+    </select>
   </div>
+
   <div class="fsel-wrap">
     <div class="fsel-name">STATUS</div>
     <select class="fsel" id="f_legal" onchange="applyFilters()">
-      <option value="">All</option>
-      <option value="Illegal">Illegal (Without Permit)</option>
-      <option value="Legal">Legal (With Permit)</option>
-      <option value="Existing">Existing (Baseline 2023)</option>
+      <option value="">All Status</option>
+      <option value="Illegal">Illegal — Without Permit</option>
+      <option value="Legal">Legal — With Permit</option>
+      <option value="Existing">Existing — Baseline 2023</option>
     </select>
   </div>
+
   <div class="fsel-wrap">
     <div class="fsel-name">YEAR</div>
     <select class="fsel" id="f_year" onchange="applyFilters()">
@@ -275,6 +297,7 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sa
       <option value="2025">2025 New</option>
     </select>
   </div>
+
   <button class="filter-reset" onclick="resetFilters()">Reset</button>
   <div class="filter-count" id="filterCount"></div>
 </div>
@@ -376,7 +399,7 @@ const F = {
 };
 
 // Active filters (applied per-city query)
-let activeFilters = {sector:'', zone:'', legal:'', year:''};
+let activeFilters = {sector:'', cell:'', village:'', zone:'', legal:'', year:''};
 let currentCity = null; // which city view is open
 
 // Raw data store
@@ -540,34 +563,36 @@ function buildRawRows(city, d){
 }
 
 function populateFilterDropdowns(city, d){
-  // Only populate when that city tab is active
-  // Global approach: merge all cities' options
-  const fSec = $('f_sector');
-  const fZone = $('f_zone');
-  const addOpt = (sel, val) => {
+  const addOpt = (selId, val) => {
+    const sel = $(selId); if(!sel) return;
     if(![...sel.options].some(o=>o.value===val)){
       const o = document.createElement('option');
       o.value = val; o.textContent = val;
       sel.appendChild(o);
     }
   };
-  [...d.allSectors].sort().forEach(s => addOpt(fSec, s));
-  [...d.allZones].sort().forEach(z => addOpt(fZone, z));
+  [...d.allSectors].sort().forEach(s  => addOpt('f_sector', s));
+  [...d.allZones].sort().forEach(z    => addOpt('f_zone', z));
+  Object.keys(d.byCell).sort().forEach(c    => addOpt('f_cell', c));
+  Object.keys(d.byVillage).sort().forEach(v => addOpt('f_village', v));
 }
 
 // ══════════════════════════════════════════════════════════════
 //  FILTERS
 // ══════════════════════════════════════════════════════════════
 function applyFilters(){
-  activeFilters.sector = $('f_sector').value;
-  activeFilters.zone   = $('f_zone').value;
-  activeFilters.legal  = $('f_legal').value;
-  activeFilters.year   = $('f_year').value;
+  activeFilters.sector  = $('f_sector').value;
+  activeFilters.cell    = $('f_cell').value;
+  activeFilters.village = $('f_village').value;
+  activeFilters.zone    = $('f_zone').value;
+  activeFilters.legal   = $('f_legal').value;
+  activeFilters.year    = $('f_year').value;
+
   const active = Object.values(activeFilters).filter(Boolean).length;
   $('filterCount').textContent = active ? `${active} filter${active>1?'s':''} active` : '';
-  // Re-render current view
+
   if(currentCity === 'all') renderAllView();
-  else if(currentCity) {
+  else if(currentCity){
     const city = CITIES.find(c=>c.id===currentCity);
     if(city) renderCity(city);
   }
@@ -575,8 +600,10 @@ function applyFilters(){
 }
 
 function resetFilters(){
-  ['f_sector','f_zone','f_legal','f_year'].forEach(id => $(id).value='');
-  activeFilters = {sector:'',zone:'',legal:'',year:''};
+  ['f_sector','f_cell','f_village','f_zone','f_legal','f_year'].forEach(id => {
+    const el=$(id); if(el) el.value='';
+  });
+  activeFilters = {sector:'',cell:'',village:'',zone:'',legal:'',year:''};
   $('filterCount').textContent = '';
   if(currentCity === 'all') renderAllView();
   else if(currentCity){
@@ -594,7 +621,7 @@ function filteredSectors(d){
 }
 function filteredCells(d){
   return Object.entries(d.byCell).filter(([cel]) =>
-    !activeFilters.sector || true // cell doesn't have sector grouping in data
+    !activeFilters.cell || cel === activeFilters.cell
   );
 }
 function filteredZones(d){
@@ -925,39 +952,92 @@ function renderLuBars(city, d){
 // ══════════════════════════════════════════════════════════════
 function buildDownloadTable(city, d){
   const tbody = $(`dlBody_${city.id}`); if(!tbody) return;
-
-  // Build full flat rows: zone × sector × legal_t type summary
   const rows = [];
+
+  // Sector-level rows
+  Object.entries(d.bySector).forEach(([sec, sv])=>{
+    // Filter check
+    if(activeFilters.sector && sec!==activeFilters.sector) return;
+
+    Object.entries(d.byCell).forEach(([cel, cv])=>{
+      if(activeFilters.cell && cel!==activeFilters.cell) return;
+
+      // Zone rows matching this cell (approximate — we only have zone×legal_t, not zone×cell)
+      // So we emit sector+cell rows without zone, then zone-only rows separately
+    });
+
+    // Sector row
+    const newT = sv.illegal+sv.legal;
+    rows.push({
+      District: city.label, Province: city.province,
+      Sector: sec, Cell: '(all)', Village: '(all)', 'Zone Code': '(all)', 'Zone Type': '(all)',
+      'Baseline 2023': sv.baseline, 'New 2025': newT,
+      'Without Permit (Illegal)': sv.illegal, 'With Permit (Legal)': sv.legal,
+      'Non-Compliance %': newT>0?(sv.illegal/newT*100).toFixed(1)+'%':'—',
+    });
+  });
+
+  // Cell-level rows
+  Object.entries(d.byCell).forEach(([cel, cv])=>{
+    if(activeFilters.cell && cel!==activeFilters.cell) return;
+    if(activeFilters.sector) return; // already in sector block
+    const newT = cv.illegal+cv.legal;
+    rows.push({
+      District: city.label, Province: city.province,
+      Sector: '(all)', Cell: cel, Village: '(all)', 'Zone Code': '(all)', 'Zone Type': '(all)',
+      'Baseline 2023': cv.baseline, 'New 2025': newT,
+      'Without Permit (Illegal)': cv.illegal, 'With Permit (Legal)': cv.legal,
+      'Non-Compliance %': newT>0?(cv.illegal/newT*100).toFixed(1)+'%':'—',
+    });
+  });
+
+  // Village-level rows (new only)
+  Object.entries(d.byVillage).forEach(([vil, vv])=>{
+    if(activeFilters.village && vil!==activeFilters.village) return;
+    if(activeFilters.sector||activeFilters.cell) return;
+    const newT = vv.illegal+vv.legal;
+    if(!newT) return;
+    rows.push({
+      District: city.label, Province: city.province,
+      Sector: '(all)', Cell: '(all)', Village: vil, 'Zone Code': '(all)', 'Zone Type': '(all)',
+      'Baseline 2023': 0, 'New 2025': newT,
+      'Without Permit (Illegal)': vv.illegal, 'With Permit (Legal)': vv.legal,
+      'Non-Compliance %': newT>0?(vv.illegal/newT*100).toFixed(1)+'%':'—',
+    });
+  });
+
+  // Zone-level rows
   filteredZones(d).forEach(([zc,zv])=>{
     const newT = zv.illegal+zv.legal;
     if(newT===0&&zv.baseline===0) return;
+    if(activeFilters.sector||activeFilters.cell||activeFilters.village) return; // avoid double
     rows.push({
       District: city.label, Province: city.province,
+      Sector: '(all)', Cell: '(all)', Village: '(all)',
       'Zone Code': zc,
       'Zone Type': (zv.label||'').split('-').slice(1).join('-').trim()||zv.label||'',
-      'Baseline 2023': zv.baseline,
-      'New 2025': newT,
-      'Without Permit (Illegal)': zv.illegal,
-      'With Permit (Legal)': zv.legal,
+      'Baseline 2023': zv.baseline, 'New 2025': newT,
+      'Without Permit (Illegal)': zv.illegal, 'With Permit (Legal)': zv.legal,
       'Non-Compliance %': newT>0?(zv.illegal/newT*100).toFixed(1)+'%':'—',
     });
   });
 
+  d.dlRows = rows;
   $(`dlCount_${city.id}`).textContent = `${rows.length} rows`;
 
   tbody.innerHTML = rows.map(r=>`<tr>
     <td>${r.District}</td>
-    <td>${r['Zone Code']}</td>
-    <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r['Zone Type']}</td>
+    <td style="color:var(--ink3)">${r.Sector}</td>
+    <td style="color:var(--ink3)">${r.Cell}</td>
+    <td style="color:var(--ink3)">${r.Village}</td>
+    <td><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--teal)">${r['Zone Code']}</span></td>
+    <td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px">${r['Zone Type']}</td>
     <td style="text-align:right">${fmt(r['Baseline 2023'])}</td>
     <td style="text-align:right">${fmt(r['New 2025'])}</td>
-    <td style="text-align:right;color:var(--rose)">${fmt(r['Without Permit (Illegal)'])}</td>
+    <td style="text-align:right;color:var(--rose);font-weight:700">${fmt(r['Without Permit (Illegal)'])}</td>
     <td style="text-align:right;color:var(--lime)">${fmt(r['With Permit (Legal)'])}</td>
-    <td style="text-align:right">${r['Non-Compliance %']}</td>
+    <td style="text-align:right;font-weight:700">${r['Non-Compliance %']}</td>
   </tr>`).join('');
-
-  // Store for download
-  d.dlRows = rows;
 }
 
 function downloadCSV(cityId){
@@ -1038,13 +1118,24 @@ function initCityMap(id){
 }
 
 function applyMapFilter(id){
-  if(!mapLayers[id]||mapViews[id]==='loading') return;
+  if(!mapLayers[id]) return;
+  const esc = v => v.replace(/'/g,"''");
   const parts=[];
-  if(activeFilters.sector) parts.push(`${F.SECTOR}='${activeFilters.sector.replace(/'/g,"''")}'`);
-  if(activeFilters.zone)   parts.push(`${F.ZONE}='${activeFilters.zone}'`);
-  if(activeFilters.legal)  parts.push(`${F.LEGAL}='${activeFilters.legal}'`);
-  if(activeFilters.year)   parts.push(`${F.YEAR}='${activeFilters.year}'`);
-  mapLayers[id].definitionExpression = parts.length ? parts.join(' AND ') : '1=1';
+  if(activeFilters.sector)  parts.push(`${F.SECTOR}='${esc(activeFilters.sector)}'`);
+  if(activeFilters.cell)    parts.push(`${F.CELL}='${esc(activeFilters.cell)}'`);
+  if(activeFilters.village) parts.push(`${F.VILLAGE}='${esc(activeFilters.village)}'`);
+  if(activeFilters.zone)    parts.push(`${F.ZONE}='${esc(activeFilters.zone)}'`);
+  if(activeFilters.legal)   parts.push(`${F.LEGAL}='${activeFilters.legal}'`);
+  if(activeFilters.year)    parts.push(`${F.YEAR}='${activeFilters.year}'`);
+  const expr = parts.length ? parts.join(' AND ') : '1=1';
+  mapLayers[id].definitionExpression = expr;
+  // Auto-zoom to filtered extent when village or cell is selected
+  const view = mapViews[id];
+  if((activeFilters.village||activeFilters.cell) && view && view!=='loading'){
+    mapLayers[id].queryExtent({where:expr})
+      .then(r=>{ if(r&&r.extent) view.goTo(r.extent.expand(1.5)).catch(()=>{}); })
+      .catch(()=>{});
+  }
 }
 
 function updateMapFilter(){
@@ -1217,6 +1308,9 @@ function buildCityViews(){
             <thead>
               <tr>
                 <th>District</th>
+                <th>Sector</th>
+                <th>Cell</th>
+                <th>Village</th>
                 <th>Zone Code</th>
                 <th>Zone Type</th>
                 <th style="text-align:right">Baseline 2023</th>
