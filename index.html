@@ -571,7 +571,17 @@ body::after {
 //  CONFIG
 // ══════════════════════════════════════════════════════════════
 const ORG = 'https://services7.arcgis.com/htgaiKX6RV2DDGgK/arcgis/rest/services';
-const WEBMAP_ID = 'b6f2526893bc45f681b1581a568a5422';
+
+// Per-district WebMap IDs
+const WEBMAP_IDS = {
+  kayonza:   'b6f2526893bc45f681b1581a568a5422',
+  kirehe:    '404cca31c06c431e903c2cbe2ec78c21',
+  nyagatare: 'c4ad87443d22486c80ba24334418ef20',
+  huye:      '941cdf4230074a45ad3c01a620a84c82',
+  rubavu:    '70054aa12c7147aaaac58f4f25a976d1',
+  musanze:   '7918089a934d45839b145de29c3d908c',
+  rusizi:    '65ca0a639f1c41a888e85904b96c52c7',
+};
 
 const CITIES = [
   {id:'kayonza',   label:'Kayonza',   color:'#00d4b8', province:'Eastern Province',  svc:`${ORG}/Building_Kayonza_urban/FeatureServer/0`},
@@ -738,7 +748,7 @@ function applyFilters(){
   $('filterCount').textContent = active ? `${active} active` : '';
   if(currentCity==='all') renderAllView();
   else if(currentCity){ const city=CITIES.find(c=>c.id===currentCity); if(city) renderCity(city); }
-  updateMapFilter();
+  updateMapFilter(); // includes zoom
 }
 
 function resetFilters(){
@@ -767,38 +777,61 @@ function getFilteredTotals(d){
 }
 
 // ══════════════════════════════════════════════════════════════
-//  RENDER HELPERS
+//  RENDER HELPERS — all bars are clickable → filter map
 // ══════════════════════════════════════════════════════════════
-function barRow(label, val, maxVal, color, tooltip, extra=''){
+
+// Active filter ring: highlights bar if its value matches active filter
+const ACTIVE_RING='box-shadow:0 0 0 2px rgba(0,212,184,.8);outline:1px solid rgba(0,212,184,.4);';
+
+function barRow(label, val, maxVal, color, tooltip, extra='', clickFn=null, filterField=null, filterVal=null){
   const w = maxVal>0 ? Math.max(pctN(val,maxVal),0.5) : 0;
+  const active = filterField && filterVal && isActive(filterField, filterVal);
   const div = document.createElement('div');
   div.className='bar-row';
+  if(clickFn) { div.style.cursor='pointer'; if(active) div.style.cssText+=ACTIVE_RING; }
   div.innerHTML=`
     <span class="bar-lbl">${label}</span>
     <div class="bar-track">
-      <div class="bar-fill" style="width:${w}%;background:${color}">
+      <div class="bar-fill" style="width:${w}%;background:${color}${active?';filter:brightness(1.25)':''}">
         <span class="bar-inner-lbl">${val>0?fmt(val):''}</span>
       </div>
     </div>
     <span class="bar-val" style="color:${color}">${fmt(val)}</span>
     ${extra}`;
-  attachBarTip(div, tooltip);
+  attachBarTip(div, tooltip+(clickFn?'<br><span style="color:var(--teal);font-size:8px">▶ Click to filter map</span>':''));
+  if(clickFn) div.addEventListener('click', ()=>{ hideTip(); clickFn(filterVal); });
   return div;
 }
 
-function stackedBarRow(label, illegal, legal, maxVal, color, tooltip){
+function stackedBarRow(label, illegal, legal, maxVal, color, tooltip, clickFn=null, filterField=null, filterVal=null){
   const iW = maxVal>0 ? pctN(illegal,maxVal) : 0;
   const lW = maxVal>0 ? pctN(legal,maxVal) : 0;
+  const active = filterField && filterVal && isActive(filterField, filterVal);
   const div = document.createElement('div');
   div.className='bar-row';
+  if(clickFn){ div.style.cursor='pointer'; if(active) div.style.cssText+=ACTIVE_RING; }
   div.innerHTML=`
     <span class="bar-lbl w130">${label}</span>
     <div class="bar-stacked">
-      <div class="bar-seg" style="width:${lW}%;background:rgba(0,212,184,.65)" title="Legal: ${fmt(legal)}"></div>
-      <div class="bar-seg" style="width:${iW}%;background:rgba(232,92,120,.65)" title="Illegal: ${fmt(illegal)}"></div>
+      <div class="bar-seg seg-legal"  style="width:${lW}%;background:rgba(0,212,184,.65)"  title="Legal: ${fmt(legal)}"></div>
+      <div class="bar-seg seg-illegal" style="width:${iW}%;background:rgba(232,92,120,.65)" title="Illegal: ${fmt(illegal)}"></div>
     </div>
     <span class="bar-pct">${fmt(illegal+legal)}</span>`;
-  attachBarTip(div, tooltip);
+
+  // Attach tooltip to whole row
+  attachBarTip(div, tooltip+(clickFn?'<br><span style="color:var(--teal);font-size:8px">▶ Click bar segment to filter map</span>':''));
+
+  // Make individual segments clickable with their own filter
+  if(clickFn){
+    const legalSeg  = div.querySelector('.seg-legal');
+    const illegalSeg= div.querySelector('.seg-illegal');
+    legalSeg.style.cursor='pointer';
+    illegalSeg.style.cursor='pointer';
+    legalSeg.addEventListener('click', e=>{ e.stopPropagation(); hideTip(); filterMapByLegal('Legal'); });
+    illegalSeg.addEventListener('click', e=>{ e.stopPropagation(); hideTip(); filterMapByLegal('Illegal'); });
+    // Whole row click → filter by district/sector/cell
+    div.addEventListener('click', ()=>{ hideTip(); clickFn(filterVal); });
+  }
   return div;
 }
 
@@ -835,8 +868,12 @@ function renderCmpBars(){
   const items=CITIES.map(d=>({dist:d,data:D[d.id]})).sort((a,b)=>b.data.newTotal-a.data.newTotal);
   const maxN=items[0]?.data.newTotal||1;
   items.forEach(({dist,data})=>{
-    const row=stackedBarRow(dist.label,data.illegal,data.legal,maxN,dist.color,
-      `<b style="color:${dist.color}">${dist.label}</b><br>New: ${fmt(data.newTotal)}<br>Illegal: ${fmt(data.illegal)}<br>Legal: ${fmt(data.legal)}<br>Non-compliance: ${pct(data.illegal,data.newTotal)}`);
+    const row=stackedBarRow(
+      dist.label, data.illegal, data.legal, maxN, dist.color,
+      `<b style="color:${dist.color}">${dist.label}</b><br>New: ${fmt(data.newTotal)}<br>Illegal: ${fmt(data.illegal)}<br>Legal: ${fmt(data.legal)}<br>Non-compliance: ${pct(data.illegal,data.newTotal)}`,
+      (val)=>showTab(val),   // whole row → navigate to district tab
+      null, dist.id
+    );
     row.querySelector('.bar-lbl').style.color=dist.color;
     el.appendChild(row);
   });
@@ -851,8 +888,11 @@ function renderRiskBars(){
   items.forEach(({dist,data})=>{
     const r=pctN(data.illegal,data.newTotal);
     const col=r>90?'var(--rose)':r>70?'var(--gold)':'var(--lime)';
-    const row=barRow(dist.label,Math.round(r*10)/10,maxR,col,
-      `<b style="color:${dist.color}">${dist.label}</b><br>Non-compliance: ${r.toFixed(1)}%<br>Illegal: ${fmt(data.illegal)} of ${fmt(data.newTotal)}`);
+    const row=barRow(
+      dist.label, Math.round(r*10)/10, maxR, col,
+      `<b style="color:${dist.color}">${dist.label}</b><br>Non-compliance: ${r.toFixed(1)}%<br>Illegal: ${fmt(data.illegal)} of ${fmt(data.newTotal)}`,
+      '', (val)=>showTab(val), null, dist.id
+    );
     row.querySelector('.bar-val').textContent=r.toFixed(1)+'%';
     row.querySelector('.bar-lbl').style.color=dist.color;
     el.appendChild(row);
@@ -932,10 +972,16 @@ function renderSectorChange(city,d){
       const newT=v.illegal+v.legal, illR=pctN(v.illegal,newT);
       const rCol=illR>90?'var(--rose)':illR>70?'var(--gold)':'var(--lime)';
       const bW=pctN(v.baseline,maxAll), iW=pctN(v.illegal,maxAll), lW=pctN(v.legal,maxAll);
-      return `<div style="padding:12px 0;border-bottom:1px solid var(--bd);">
+      const isActiveSec = activeFilters.sector===sec;
+      return `<div style="padding:12px 0;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .1s;${isActiveSec?'background:rgba(0,212,184,.06);border-left:3px solid var(--teal);padding-left:12px;':''}"
+        onclick="filterMapBySector('${sec.replace(/'/g,"\\'")}')"
+        title="Click to filter map to ${sec}">
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
-          <span style="font-family:var(--serif);font-size:15px;color:var(--ink);">${sec}</span>
-          <span style="font-family:var(--mono);font-size:9px;font-weight:700;color:${rCol};">${illR.toFixed(1)}% non-compliant</span>
+          <span style="font-family:var(--serif);font-size:15px;color:${isActiveSec?'var(--teal)':'var(--ink)'};">${sec}</span>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-family:var(--mono);font-size:8px;color:var(--ink4);">▶ filter map</span>
+            <span style="font-family:var(--mono);font-size:9px;font-weight:700;color:${rCol};">${illR.toFixed(1)}% non-compliant</span>
+          </div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
           <span style="font-family:var(--mono);font-size:8px;color:var(--sky);width:68px;letter-spacing:.8px;flex-shrink:0;">Baseline</span>
@@ -944,16 +990,16 @@ function renderSectorChange(city,d){
           </div>
           <span style="font-family:var(--mono);font-size:9px;color:var(--sky);width:70px;text-align:right;flex-shrink:0;">${fmt(v.baseline)}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-          <span style="font-family:var(--mono);font-size:8px;color:var(--rose);width:68px;letter-spacing:.8px;flex-shrink:0;">Illegal</span>
-          <div style="flex:1;height:8px;background:var(--bg3);border-radius:2px;overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;" onclick="event.stopPropagation();filterMapByLegal('Illegal')">
+          <span style="font-family:var(--mono);font-size:8px;color:var(--rose);width:68px;letter-spacing:.8px;flex-shrink:0;cursor:pointer;">Illegal ▶</span>
+          <div style="flex:1;height:8px;background:var(--bg3);border-radius:2px;overflow:hidden;cursor:pointer;">
             <div style="width:${iW}%;height:100%;background:rgba(232,92,120,.65);border-radius:2px;"></div>
           </div>
           <span style="font-family:var(--mono);font-size:9px;color:var(--rose);width:70px;text-align:right;flex-shrink:0;">${fmt(v.illegal)}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-family:var(--mono);font-size:8px;color:var(--lime);width:68px;letter-spacing:.8px;flex-shrink:0;">Legal</span>
-          <div style="flex:1;height:8px;background:var(--bg3);border-radius:2px;overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation();filterMapByLegal('Legal')">
+          <span style="font-family:var(--mono);font-size:8px;color:var(--lime);width:68px;letter-spacing:.8px;flex-shrink:0;cursor:pointer;">Legal ▶</span>
+          <div style="flex:1;height:8px;background:var(--bg3);border-radius:2px;overflow:hidden;cursor:pointer;">
             <div style="width:${lW}%;height:100%;background:rgba(98,201,122,.65);border-radius:2px;"></div>
           </div>
           <span style="font-family:var(--mono);font-size:9px;color:var(--lime);width:70px;text-align:right;flex-shrink:0;">${fmt(v.legal)}</span>
@@ -995,11 +1041,14 @@ function renderCellBars(city,d){
   const el=$(`cellBars_${city.id}`); if(!el) return; el.innerHTML='';
   const items=filteredCells(d).map(([cel,v])=>({cel,...v,newT:v.illegal+v.legal}))
     .filter(r=>r.newT>0||r.baseline>0).sort((a,b)=>b.newT-a.newT);
-  const maxN=Math.max(...items.map(r=>r.illegal))||1;
-  $(`cellMeta_${city.id}`).textContent=`${items.length} cells`;
+  const maxN=Math.max(...items.map(r=>r.illegal),1);
+  $(`cellMeta_${city.id}`).textContent=`${items.length} cells · click to filter map`;
   items.forEach(({cel,baseline,illegal,legal,newT})=>{
-    const row=stackedBarRow(cel,illegal,legal,Math.max(maxN,1),'var(--sky)',
-      `<b>${cel}</b><br>Baseline: ${fmt(baseline)}<br>New 2025: ${fmt(newT)}<br>Illegal: ${fmt(illegal)}<br>Legal: ${fmt(legal)}<br>Non-compliance: ${pct(illegal,newT)}`);
+    const row=stackedBarRow(
+      cel, illegal, legal, Math.max(maxN,1), 'var(--sky)',
+      `<b>${cel}</b><br>Baseline: ${fmt(baseline)}<br>New 2025: ${fmt(newT)}<br>Illegal: ${fmt(illegal)}<br>Legal: ${fmt(legal)}<br>Non-compliance: ${pct(illegal,newT)}`,
+      filterMapByCell, 'cell', cel
+    );
     el.appendChild(row);
   });
 }
@@ -1009,11 +1058,14 @@ function renderVillageBars(city,d){
   const items=Object.entries(d.byVillage).map(([vil,v])=>({vil,...v,total:v.illegal+v.legal}))
     .filter(r=>r.illegal>0).sort((a,b)=>b.illegal-a.illegal);
   const maxI=items[0]?.illegal||1;
-  $(`vilMeta_${city.id}`).textContent=`${items.length} villages with illegal constructions`;
+  $(`vilMeta_${city.id}`).textContent=`${items.length} villages · click to filter map`;
   items.slice(0,30).forEach(({vil,illegal,legal,total})=>{
-    const row=barRow(vil,illegal,maxI,'var(--rose)',
+    const row=barRow(
+      vil, illegal, maxI, 'var(--rose)',
       `<b>${vil}</b><br>Illegal: ${fmt(illegal)}<br>Legal: ${fmt(legal)}<br>Non-compliance: ${pct(illegal,total)}`,
-      `<span class="bar-pct">${pct(illegal,total)}</span>`);
+      `<span class="bar-pct">${pct(illegal,total)}</span>`,
+      filterMapByVillage, 'village', vil
+    );
     el.appendChild(row);
   });
 }
@@ -1022,10 +1074,13 @@ function renderLuBars(city,d){
   const el=$(`luBars_${city.id}`); if(!el) return; el.innerHTML='';
   const items=Object.entries(d.byGenLu).map(([lu,v])=>({lu,...v,total:v.illegal+v.legal}))
     .filter(r=>r.total>0).sort((a,b)=>b.illegal-a.illegal);
-  const maxN=Math.max(...items.map(r=>r.illegal))||1;
+  const maxN=Math.max(...items.map(r=>r.illegal),1);
   items.forEach(({lu,illegal,legal,total})=>{
-    const row=stackedBarRow(lu,illegal,legal,maxN,'var(--teal)',
-      `<b>${lu}</b><br>Illegal: ${fmt(illegal)}<br>Legal: ${fmt(legal)}<br>Non-compliance: ${pct(illegal,total)}`);
+    const row=stackedBarRow(
+      lu, illegal, legal, maxN, 'var(--teal)',
+      `<b>${lu}</b><br>Illegal: ${fmt(illegal)}<br>Legal: ${fmt(legal)}<br>Non-compliance: ${pct(illegal,total)}`,
+      null, null, null   // land-use has no direct filter field; only segment clicks (Illegal/Legal) work
+    );
     el.appendChild(row);
   });
 }
@@ -1098,30 +1153,9 @@ const permitRenderer={
 
 const popupTpl={title:'{legal_t} — {status_t}',content:'<b>Zone:</b> {zone_code} — {zoning}<br><b>Land Use:</b> {gen_lu}<br><b>Sector:</b> {sector}<br><b>Cell:</b> {cell}<br><b>Village:</b> {village}<br><b>Year:</b> {year_t}'};
 
-function initCityMap(id){
-  if(mapViews[id]) return; mapViews[id]='loading';
-  const city=CITIES.find(c=>c.id===id); if(!city) return;
-  loadArcGIS(()=>{
-    require(['esri/WebMap','esri/views/MapView','esri/layers/FeatureLayer','esri/widgets/Home','esri/widgets/Search','esri/widgets/Legend','esri/widgets/Expand','esri/widgets/ScaleBar'],
-    function(WebMap,MapView,FeatureLayer,Home,Search,Legend,Expand,ScaleBar){
-      const layer=new FeatureLayer({url:city.svc,renderer:permitRenderer,popupTemplate:popupTpl,title:`${city.label} — Construction Status`});
-      mapLayers[id]=layer;
-      const wm=new WebMap({portalItem:{id:WEBMAP_ID}}); wm.add(layer);
-      const view=new MapView({container:`mapDiv_${id}`,map:wm,zoom:13,ui:{components:['zoom','attribution']},popup:{dockEnabled:true,dockOptions:{position:'bottom-right',breakpoint:false}}});
-      view.ui.add(new Home({view}),'top-left'); view.ui.add(new Search({view}),'top-right');
-      view.ui.add(new ScaleBar({view,unit:'metric'}),'bottom-right');
-      view.ui.add(new Expand({view,content:new Legend({view,layerInfos:[{layer,title:'Permit Status'}]}),expandIcon:'legend',expanded:true}),'bottom-left');
-      view.when(()=>{
-        $(`mhint_${id}`).textContent=`${city.label} · click a building for details`;
-        mapViews[id]=view; applyMapFilter(id);
-      });
-    });
-  });
-}
-
-function applyMapFilter(id){
-  if(!mapLayers[id]) return;
-  const esc=v=>v.replace(/'/g,"''");
+// ── Build the definitionExpression string from active filters
+function buildMapExpr(){
+  const esc=v=>String(v).replace(/'/g,"''");
   const parts=[];
   if(activeFilters.sector)  parts.push(`${F.SECTOR}='${esc(activeFilters.sector)}'`);
   if(activeFilters.cell)    parts.push(`${F.CELL}='${esc(activeFilters.cell)}'`);
@@ -1129,16 +1163,177 @@ function applyMapFilter(id){
   if(activeFilters.zone)    parts.push(`${F.ZONE}='${esc(activeFilters.zone)}'`);
   if(activeFilters.legal)   parts.push(`${F.LEGAL}='${activeFilters.legal}'`);
   if(activeFilters.year)    parts.push(`${F.YEAR}='${activeFilters.year}'`);
-  const expr=parts.length?parts.join(' AND '):'1=1';
+  return parts.length ? parts.join(' AND ') : '1=1';
+}
+
+// ── Zoom map to filtered extent
+function zoomMapToFilter(id){
+  const view=mapViews[id]; const layer=mapLayers[id];
+  if(!layer||!view||view==='loading') return;
+  const expr=layer.definitionExpression;
+  if(!expr||expr==='1=1') return;
+  layer.queryExtent({where:expr,outSpatialReference:{wkid:102100}})
+    .then(r=>{ if(r&&r.extent) view.goTo(r.extent.expand(1.4),{duration:800,easing:'ease-in-out'}).catch(()=>{}); })
+    .catch(()=>{});
+}
+
+// ── Apply current filters to a specific map layer + zoom
+function applyMapFilter(id, doZoom=false){
+  if(!mapLayers[id]) return;
+  const expr=buildMapExpr();
   mapLayers[id].definitionExpression=expr;
-  const view=mapViews[id];
-  if((activeFilters.village||activeFilters.cell)&&view&&view!=='loading'){
-    mapLayers[id].queryExtent({where:expr}).then(r=>{if(r&&r.extent)view.goTo(r.extent.expand(1.5)).catch(()=>{});}).catch(()=>{});
+  // Update hint bar
+  const hint=$(`mhint_${id}`);
+  if(hint){
+    const city=CITIES.find(c=>c.id===id);
+    const filterDesc = expr==='1=1'
+      ? `${city?.label||id} · click a building for details`
+      : `Filtered: ${expr.replace(/AND/g,'·')}`;
+    hint.textContent=filterDesc;
+  }
+  if(doZoom || activeFilters.sector || activeFilters.cell || activeFilters.village || activeFilters.zone || activeFilters.legal){
+    zoomMapToFilter(id);
   }
 }
 
-function updateMapFilter(){ CITIES.forEach(c=>{if(mapLayers[c.id])applyMapFilter(c.id);}); }
-function updateCityMap(city){ if(mapLayers[city.id])applyMapFilter(city.id); }
+function updateMapFilter(){
+  CITIES.forEach(c=>{ if(mapLayers[c.id]) applyMapFilter(c.id, true); });
+}
+function updateCityMap(city){ if(mapLayers[city.id]) applyMapFilter(city.id, false); }
+
+// ── Filter map directly from bar chart click — no dropdown needed
+function filterMapByLegal(legalVal){
+  // Toggle: clicking same value clears it
+  if(activeFilters.legal===legalVal) legalVal='';
+  activeFilters.legal=legalVal;
+  const sel=$('f_legal'); if(sel) sel.value=legalVal;
+  const active=Object.values(activeFilters).filter(Boolean).length;
+  $('filterCount').textContent=active?`${active} active`:'';
+  // Re-render charts to reflect selection
+  if(currentCity&&currentCity!=='all'){ const city=CITIES.find(c=>c.id===currentCity); if(city) renderCity(city); }
+  else renderAllView();
+  updateMapFilter();
+}
+
+function filterMapBySector(sectorVal){
+  if(activeFilters.sector===sectorVal) sectorVal='';
+  activeFilters.sector=sectorVal;
+  const sel=$('f_sector'); if(sel) sel.value=sectorVal;
+  const active=Object.values(activeFilters).filter(Boolean).length;
+  $('filterCount').textContent=active?`${active} active`:'';
+  if(currentCity&&currentCity!=='all'){ const city=CITIES.find(c=>c.id===currentCity); if(city) renderCity(city); }
+  else renderAllView();
+  updateMapFilter();
+}
+
+function filterMapByCell(cellVal){
+  if(activeFilters.cell===cellVal) cellVal='';
+  activeFilters.cell=cellVal;
+  const sel=$('f_cell'); if(sel) sel.value=cellVal;
+  const active=Object.values(activeFilters).filter(Boolean).length;
+  $('filterCount').textContent=active?`${active} active`:'';
+  if(currentCity&&currentCity!=='all'){ const city=CITIES.find(c=>c.id===currentCity); if(city) renderCity(city); }
+  else renderAllView();
+  updateMapFilter();
+}
+
+function filterMapByVillage(villageVal){
+  if(activeFilters.village===villageVal) villageVal='';
+  activeFilters.village=villageVal;
+  const sel=$('f_village'); if(sel) sel.value=villageVal;
+  const active=Object.values(activeFilters).filter(Boolean).length;
+  $('filterCount').textContent=active?`${active} active`:'';
+  if(currentCity&&currentCity!=='all'){ const city=CITIES.find(c=>c.id===currentCity); if(city) renderCity(city); }
+  else renderAllView();
+  updateMapFilter();
+}
+
+function filterMapByZone(zoneVal){
+  if(activeFilters.zone===zoneVal) zoneVal='';
+  activeFilters.zone=zoneVal;
+  const sel=$('f_zone'); if(sel) sel.value=zoneVal;
+  const active=Object.values(activeFilters).filter(Boolean).length;
+  $('filterCount').textContent=active?`${active} active`:'';
+  if(currentCity&&currentCity!=='all'){ const city=CITIES.find(c=>c.id===currentCity); if(city) renderCity(city); }
+  else renderAllView();
+  updateMapFilter();
+}
+
+// ── Active filter highlight style for bar rows
+function isActive(field, val){
+  const map={legal:activeFilters.legal,sector:activeFilters.sector,cell:activeFilters.cell,village:activeFilters.village,zone:activeFilters.zone};
+  return map[field]===val && val!=='';
+}
+
+function initCityMap(id){
+  if(mapViews[id]) return; mapViews[id]='loading';
+  const city=CITIES.find(c=>c.id===id); if(!city) return;
+  const wmId=WEBMAP_IDS[id];
+  if(!wmId){ console.warn('No WebMap ID for',id); return; }
+
+  loadArcGIS(()=>{
+    require([
+      'esri/WebMap','esri/views/MapView','esri/layers/FeatureLayer',
+      'esri/widgets/Home','esri/widgets/Search','esri/widgets/Legend',
+      'esri/widgets/Expand','esri/widgets/ScaleBar'
+    ],
+    function(WebMap,MapView,FeatureLayer,Home,Search,Legend,Expand,ScaleBar){
+      const layer=new FeatureLayer({
+        url:city.svc,
+        renderer:permitRenderer,
+        popupTemplate:popupTpl,
+        title:`${city.label} — Construction Status`,
+        outFields:['*']
+      });
+      mapLayers[id]=layer;
+
+      const wm=new WebMap({portalItem:{id:wmId}});
+      wm.add(layer);
+
+      const view=new MapView({
+        container:`mapDiv_${id}`,
+        map:wm,
+        zoom:13,
+        ui:{components:['zoom','attribution']},
+        popup:{dockEnabled:true,dockOptions:{position:'bottom-right',breakpoint:false}}
+      });
+
+      view.ui.add(new Home({view}),'top-left');
+      view.ui.add(new Search({view}),'top-right');
+      view.ui.add(new ScaleBar({view,unit:'metric'}),'bottom-right');
+      view.ui.add(new Expand({
+        view,
+        content:new Legend({view,layerInfos:[{layer,title:'Permit Status'}]}),
+        expandIcon:'legend',expanded:false
+      }),'bottom-left');
+
+      view.when(()=>{
+        mapViews[id]=view;
+        applyMapFilter(id, false);
+
+        // ── Click on map feature → update filters + re-render charts
+        view.on('click', async evt=>{
+          try{
+            const res=await view.hitTest(evt,{include:[layer]});
+            const hit=res.results[0];
+            if(!hit||!hit.graphic) return;
+            const a=hit.graphic.attributes;
+
+            // If clicking on a sector highlight it in filters
+            if(a[F.SECTOR] && a[F.SECTOR]!==activeFilters.sector){
+              activeFilters.sector=a[F.SECTOR];
+              const sel=$('f_sector'); if(sel) sel.value=a[F.SECTOR];
+              const active=Object.values(activeFilters).filter(Boolean).length;
+              $('filterCount').textContent=active?`${active} active`:'';
+              const c=CITIES.find(c=>c.id===id); if(c) renderCity(c);
+              applyMapFilter(id, false); // don't re-zoom on feature click
+            }
+          }catch(e){}
+        });
+      });
+    });
+  });
+}
 
 // ══════════════════════════════════════════════════════════════
 //  BUILD DOM
@@ -1211,15 +1406,24 @@ function buildCityViews(){
 
       <div class="sec-hd">
         ArcGIS Feature Map — Permit Status by Building
-        <span class="sec-hd-meta">Filters applied to map in real-time</span>
+        <span class="sec-hd-meta">Filters sync to map · click bars to filter · click features to inspect</span>
       </div>
       <div class="card mb24">
         <div class="card-hd">
           <div class="card-title"><span class="card-title-dot"></span>${c.label} — Building Permit Status</div>
-          <div style="display:flex;gap:16px;align-items:center;">
-            <span class="map-key"><span class="map-swatch" style="background:var(--bg4)"></span>Existing 2023</span>
-            <span class="map-key"><span class="map-swatch" style="background:var(--rose)"></span>Illegal</span>
-            <span class="map-key"><span class="map-swatch" style="background:var(--teal)"></span>Legal</span>
+          <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+            <span class="map-key" style="cursor:pointer" onclick="filterMapByLegal('Existing')" title="Click to show only 2023 baseline">
+              <span class="map-swatch" style="background:var(--bg4)"></span>Existing 2023
+            </span>
+            <span class="map-key" style="cursor:pointer" onclick="filterMapByLegal('Illegal')" title="Click to show only illegal constructions">
+              <span class="map-swatch" style="background:var(--rose)"></span>Illegal
+            </span>
+            <span class="map-key" style="cursor:pointer" onclick="filterMapByLegal('Legal')" title="Click to show only legal constructions">
+              <span class="map-swatch" style="background:var(--teal)"></span>Legal
+            </span>
+            <button onclick="resetFilters()" style="padding:3px 10px;background:none;border:1px solid var(--bd2);color:var(--ink3);font-family:var(--mono);font-size:8px;letter-spacing:1px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='var(--rose)';this.style.color='var(--rose)'" onmouseout="this.style.borderColor='var(--bd2)';this.style.color='var(--ink3)'">
+              Reset Map
+            </button>
           </div>
         </div>
         <div class="map-div" id="mapDiv_${c.id}"></div>
