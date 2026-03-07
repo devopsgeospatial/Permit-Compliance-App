@@ -3,1541 +3,1199 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Building Monitoring Application</title>
+<title>Building Changes Application</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
-/* ══════════════════════════════════════════════════
-   DESIGN
-══════════════════════════════════════════════════ */
-:root {
-  /* Backgrounds */
-  --bg:   #0b1a2b;
-  --bg1:  #0e1f32;
-  --bg2:  #122438;
-  --bg3:  #162c42;
-  --bg4:  #1c3550;
-  --bg5:  #243f5e;
-
-  /* Borders */
-  --bd:   rgba(255,255,255,.06);
-  --bd2:  rgba(255,255,255,.11);
-  --bd3:  rgba(255,255,255,.18);
-
-  /* Text —  */
-  --ink:  #f0f6ff;     /* primary text  */
-  --ink2: #a8c8e8;     /* secondary  */
-  --ink3: #7fb8d8;     /* tertiary labels */
-  --ink4: #5a90b0;     /* dim / disabled */
-
-  /* Accent palette — streamlined: teal primary, one warm, one alert */
-  --teal:   #00d4b8;
-  --teald:  rgba(0,212,184,.08);
-  --tealb:  rgba(0,212,184,.18);
-
-  --gold:   #e8b84b;   /* warm accent — permit/legal */
-  --goldd:  rgba(232,184,75,.1);
-
-  --rose:   #e85c78;   /* alert — illegal/violation */
-  --rosed:  rgba(232,92,120,.1);
-
-  --sky:    #4ab0e8;   /* info — baseline */
-  --skyd:   rgba(74,176,232,.08);
-
-  --lime:   #62c97a;   /* success — compliant */
-  --limed:  rgba(98,201,122,.08);
-
-  /* sparingly as teal variant */
-
-  --mono: 'JetBrains Mono', 'Fira Mono', monospace;
-  --serif:'DM Serif Display', serif;
-  --sans: 'Syne', 'Segoe UI', system-ui, sans-serif;
+:root{
+  --bg:#0b1a2b; --bg1:#0e1f32; --bg2:#122438; --bg3:#162c42; --bg4:#1c3550; --bg5:#243f5e;
+  --bd:rgba(255,255,255,.06); --bd2:rgba(255,255,255,.11); --bd3:rgba(255,255,255,.18);
+  --ink:#f0f6ff; --ink2:#a8c8e8; --ink3:#7fb8d8; --ink4:#5a90b0;
+  --teal:#00d4b8; --teald:rgba(0,212,184,.08); --tealb:rgba(0,212,184,.18);
+  --gold:#e8b84b; --rose:#e85c78; --sky:#4ab0e8; --lime:#62c97a;
+  --limed:rgba(98,201,122,.08);
+  --mono:'JetBrains Mono',monospace; --serif:'DM Serif Display',serif;
 }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow-x:hidden;}
+body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:13px;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 100% 50% at 50% -5%,rgba(0,212,184,.05) 0%,transparent 55%),radial-gradient(ellipse 60% 40% at 90% 80%,rgba(74,176,232,.03) 0%,transparent 50%);pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,212,184,.008) 3px,rgba(0,212,184,.008) 4px);pointer-events:none;z-index:0;}
 
-*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
-html,body { height:100%; background:var(--bg); color:var(--ink); font-family:var(--mono); font-size:13px; overflow-x:hidden; }
-
-/* Subtle atmosphere  */
-body::before {
-  content:'';
-  position:fixed; inset:0;
-  background:
-    radial-gradient(ellipse 100% 50% at 50% -5%, rgba(0,212,184,.05) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 40% at 90% 80%, rgba(74,176,232,.03) 0%, transparent 50%);
-  pointer-events:none; z-index:0;
-}
-body::after {
-  content:'';
-  position:fixed; inset:0;
-  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,212,184,.008) 3px,rgba(0,212,184,.008) 4px);
-  pointer-events:none; z-index:0;
-}
-
-/* ── MASTHEAD ── */
-.masthead {
-  position:relative; z-index:300;
-  background:linear-gradient(180deg, rgba(7,17,28,1) 0%, var(--bg) 100%);
+/* ══ MASTHEAD ══ */
+.masthead{
+  position:relative;z-index:300;
+  background:linear-gradient(180deg,rgba(7,17,28,1) 0%,var(--bg) 100%);
   border-bottom:1px solid var(--bd2);
-  padding:0 32px;
-  height:64px;
-  display:flex; align-items:center; justify-content:space-between; gap:32px;
+  padding:0 32px;height:52px;
+  display:flex;align-items:center;gap:32px;
 }
-.mh-eyebrow {
-  font-family:var(--mono); font-size:9px; letter-spacing:2.5px;
-  text-transform:uppercase; color:var(--teal);
-  display:flex; align-items:center; gap:8px; margin-bottom:4px;
-}
-.mh-eyebrow::before { content:''; width:20px; height:1px; background:var(--teal); }
-.mh-title { font-family:var(--serif); font-size:20px; color:var(--ink); letter-spacing:-.2px; line-height:1; }
-.mh-title em { color:var(--teal); font-style:italic; }
+.mh-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.mh-eyebrow::before{content:'';width:20px;height:1px;background:var(--ink4);}
+.mh-title{font-family:var(--serif);font-size:20px;color:var(--ink);letter-spacing:-.2px;line-height:1;}
+.mh-title em{color:var(--ink);font-style:italic;}
+.gkpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bd2);border:1px solid var(--bd2);margin-bottom:20px;}
+.gkpi-cell{background:var(--bg1);padding:16px 24px;position:relative;overflow:hidden;transition:background .2s;}
+.gkpi-cell:hover{background:var(--bg2);}
+.gkpi-cell::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--kc,var(--teal));transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+.gkpi-cell:hover::after{transform:scaleX(1);}
+.gkpi-lbl{font-family:var(--mono);font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:var(--ink2);margin-bottom:6px;}
+.gkpi-val{font-family:var(--serif);font-size:28px;line-height:1;}
+.gkpi-sub{font-family:var(--mono);font-size:9px;color:var(--ink3);margin-top:4px;}
 
-/* Global KPI strip */
-.gkpi-row { display:flex; gap:1px; margin-left:auto; height:64px; }
-.gkpi {
-  padding:0 22px; display:flex; flex-direction:column; justify-content:center;
-  border-left:1px solid var(--bd2); min-width:130px;
-}
-.gkpi-lbl { font-family:var(--mono); font-size:8px; letter-spacing:1.8px; color:var(--ink3); text-transform:uppercase; margin-bottom:4px; }
-.gkpi-val { font-family:var(--serif); font-size:22px; font-weight:400; line-height:1; }
-.gkpi-sub { font-family:var(--mono); font-size:8px; color:var(--ink4); margin-top:3px; }
+/* ══ STATUS BAR ══ */
+.sbar{position:relative;z-index:280;display:flex;align-items:center;gap:10px;padding:8px 32px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:var(--teal);border-bottom:1px solid rgba(0,212,184,.15);background:rgba(0,212,184,.03);}
+.sbar.gone{display:none;}
+.sring{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(0,212,184,.2);border-top-color:var(--teal);animation:rot .7s linear infinite;flex-shrink:0;}
+@keyframes rot{to{transform:rotate(360deg)}}
 
-/* ── FILTER BAR ── */
-.filter-bar {
-  position:sticky; top:0; z-index:290;
-  background:var(--bg1); border-bottom:1px solid var(--bd2);
-  padding:0; height:44px;
-  display:flex; align-items:stretch;
-  overflow-x:auto; scrollbar-width:none;
+/* ══ FILTER BAR ══ */
+.filter-bar{
+  position:sticky;top:0;z-index:270;
+  background:var(--bg1);border-bottom:1px solid var(--bd2);
+  padding:0 32px;height:44px;
+  display:flex;align-items:center;gap:20px;
 }
-.filter-bar::-webkit-scrollbar { display:none; }
-.filter-lbl {
-  padding:0 12px 0 20px;
-  font-family:var(--mono); font-size:8px; letter-spacing:2px; text-transform:uppercase;
-  color:var(--ink3); background:var(--bg2); border-right:1px solid var(--bd);
-  display:flex; align-items:center; gap:6px; flex-shrink:0; white-space:nowrap;
-}
-.fsel-wrap { display:flex; align-items:stretch; border-right:1px solid var(--bd); }
-.fsel-name {
-  padding:0 6px 0 12px;
-  font-family:var(--mono); font-size:8px; letter-spacing:1.2px; text-transform:uppercase;
-  color:var(--ink3); display:flex; align-items:center; white-space:nowrap;
-}
-.fsel {
-  padding:0 22px 0 4px; border:none; outline:none;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%235a90b0' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 6px center transparent;
-  color:var(--ink); font-family:var(--mono); font-size:10px;
-  appearance:none; cursor:pointer; min-width:72px;
-}
-.fsel option { background:var(--bg2); }
-.fsel:focus { background-color:var(--teald); }
-.filter-reset {
-  padding:0 14px; background:none; border:none; border-left:1px solid var(--bd);
-  color:var(--ink3); font-family:var(--mono); font-size:9px; letter-spacing:1.5px;
-  text-transform:uppercase; cursor:pointer; transition:all .15s; white-space:nowrap;
-  display:flex; align-items:center; gap:4px;
-}
-.filter-reset:hover { color:var(--rose); }
-.filter-count { font-family:var(--mono); font-size:9px; color:var(--teal); margin-left:auto; padding:0 16px; display:flex; align-items:center; white-space:nowrap; }
+.filter-label{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);white-space:nowrap;}
+.filter-label::before{content:'◆';color:var(--ink4);margin-right:7px;font-size:7px;}
 
-/* ── STATUS BAR ── */
-.sbar {
-  position:relative; z-index:280;
-  display:flex; align-items:center; gap:10px;
-  padding:8px 32px;
-  font-family:var(--mono); font-size:9px; letter-spacing:1.5px; color:var(--teal);
-  border-bottom:1px solid rgba(0,212,184,.15);
-  background:rgba(0,212,184,.03);
-  transition:all .2s;
+/* Custom select wrapper */
+.sel-wrap{position:relative;display:flex;align-items:center;}
+.sel-dot{position:absolute;left:11px;width:7px;height:7px;border-radius:50%;z-index:1;pointer-events:none;transition:background .2s;}
+.dist-select{
+  appearance:none;-webkit-appearance:none;
+  background:var(--bg2);
+  border:1px solid var(--bd3);
+  color:var(--ink);
+  font-family:var(--mono);font-size:10px;letter-spacing:.5px;
+  padding:0 36px 0 26px;
+  height:30px;
+  cursor:pointer;
+  outline:none;
+  transition:border-color .15s,background .15s;
+  min-width:200px;
 }
-.sbar.gone { display:none; }
-.sring { width:12px; height:12px; border-radius:50%; border:1.5px solid rgba(0,212,184,.2); border-top-color:var(--teal); animation:rot .7s linear infinite; flex-shrink:0; }
-@keyframes rot { to { transform:rotate(360deg); } }
-@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.2} }
+.dist-select:hover{border-color:var(--teal);background:var(--bg3);}
+.dist-select:focus{border-color:var(--teal);}
+.sel-arrow{position:absolute;right:10px;pointer-events:none;color:var(--ink3);}
+.sel-arrow svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5;}
+/* dropdown option styling */
+.dist-select option{background:var(--bg2);color:var(--ink);}
 
-/* ── TAB BAR ── */
-.tab-bar {
-  position:sticky; top:44px; z-index:270;
-  background:var(--bg1); border-bottom:1px solid var(--bd2);
-  padding:0 32px; display:flex; flex-direction:row;
-  overflow-x:auto; scrollbar-width:none;
-}
-.tab-bar::-webkit-scrollbar { display:none; }
-.tab {
-  padding:0 18px; height:40px;
-  font-family:var(--mono); font-size:9px; letter-spacing:1.5px; text-transform:uppercase;
-  color:var(--ink3); cursor:pointer; border:none; background:none;
-  border-bottom:2px solid transparent; white-space:nowrap;
-  transition:color .15s, border-color .15s;
-  display:flex; align-items:center; gap:8px;
-}
-.tab:hover { color:var(--ink2); }
-.tab.on { color:var(--ink); border-bottom-color:var(--teal); }
-.tab-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-.tbadge {
-  font-size:8px; padding:2px 7px; border-radius:2px;
-  background:var(--bg3); color:var(--ink3);
-}
-.tab.on .tbadge { background:var(--teal); color:var(--bg); }
+.filter-divider{width:1px;height:22px;background:var(--bd2);}
 
-/* ── MAIN ── */
-.main { padding:28px 32px 80px; position:relative; z-index:1; }
-.city-view { display:none; }
-.city-view.on { display:block; }
+/* current view indicator */
+.view-indicator{display:flex;align-items:center;gap:8px;}
+.view-dot{width:7px;height:7px;border-radius:50%;transition:background .2s;}
+.view-name{font-family:var(--serif);font-size:15px;color:var(--ink);transition:color .2s;}
+.view-sub{font-family:var(--mono);font-size:8px;color:var(--ink4);letter-spacing:1px;text-transform:uppercase;}
 
-/* ── PAGE HEADER ── */
-.page-hd {
-  display:flex; align-items:flex-end; justify-content:space-between;
-  margin-bottom:24px; padding-bottom:16px;
-  border-bottom:1px solid var(--bd2);
-  position:relative;
+/* back to overview btn */
+.btn-back{
+  margin-left:auto;
+  display:none;align-items:center;gap:7px;
+  padding:5px 14px;
+  background:var(--teald);border:1px solid rgba(0,212,184,.25);
+  color:var(--teal);font-family:var(--mono);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;
+  cursor:pointer;transition:all .15s;
 }
-.page-hd::before {
-  content:''; position:absolute; bottom:-1px; left:0;
-  width:60px; height:2px;
-  background:linear-gradient(90deg, var(--teal), transparent);
-  opacity:.6;
-}
-.page-title { font-family:var(--serif); font-size:28px; color:var(--ink); margin-bottom:5px; line-height:1.1; }
-.page-sub { font-family:var(--mono); font-size:9px; color:var(--ink3); letter-spacing:1.5px; }
-.page-sub .scope-tag { color:var(--gold); font-weight:600; }
+.btn-back.show{display:flex;}
+.btn-back:hover{background:var(--tealb);}
+.btn-back svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5;}
 
-/* ── CONTEXT NOTICE ── */
-.context-notice {
-  background:var(--bg2); border:1px solid var(--bd2);
-  border-left:3px solid var(--gold);
-  padding:12px 18px; margin-bottom:24px;
-  font-family:var(--mono); font-size:9px; color:var(--ink2);
-  letter-spacing:.3px; line-height:1.7;
-}
-.context-notice strong { color:var(--gold); }
+/* ══ MAIN ══ */
+.main{padding:0 32px 80px;position:relative;z-index:1;}
 
-/* ── KPI ROW ── */
-.kpi-row {
-  display:grid; grid-template-columns:repeat(5,1fr);
-  gap:1px; margin-bottom:24px;
-  background:var(--bd2); border:1px solid var(--bd2); border-radius:3px; overflow:hidden;
-}
-.kcard {
-  background:var(--bg1); padding:18px 20px;
-  position:relative;
-}
-.kcard::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
-.kcard::after {
-  content:''; position:absolute; bottom:0; left:0; right:0; height:1px;
-  background:linear-gradient(90deg, var(--teal), transparent); opacity:.2;
-}
-.kcard.k-sky::before   { background:var(--sky); }
-.kcard.k-rose::before  { background:var(--rose); }
-.kcard.k-lime::before  { background:var(--lime); }
-.kcard.k-gold::before  { background:var(--gold); }
-.kcard.k-teal::before  { background:var(--teal); }
-.kcard-lbl {
-  font-family:var(--mono); font-size:8px; letter-spacing:1.8px;
-  color:var(--ink3); text-transform:uppercase; margin-bottom:10px;
-}
-.kcard-val {
-  font-family:var(--serif); font-size:30px; font-weight:400; line-height:1;
-}
-.kcard-sub { font-family:var(--mono); font-size:8px; color:var(--ink4); margin-top:6px; }
+/* ══ PAGE VIEWS ══ */
+.view{display:none;animation:fadein .2s ease;}
+.view.active{display:block;}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── SECTION HEADING ── */
-.sec-hd {
-  font-family:var(--mono); font-size:9px; letter-spacing:2px; text-transform:uppercase;
-  color:var(--ink2); padding-bottom:10px;
-  border-bottom:1px solid var(--bd2); margin-bottom:14px; margin-top:32px;
-  display:flex; justify-content:space-between; align-items:center;
-  position:relative;
-}
-.sec-hd::before {
-  content:''; position:absolute; bottom:-1px; left:0;
-  width:40px; height:2px; background:var(--teal); opacity:.5;
-}
-.sec-hd-meta { font-size:8px; color:var(--ink4); letter-spacing:1px; }
+/* ══ OVERVIEW ══ */
+.overview{padding-top:28px;}
+.ov-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;}
+.ov-hd-title{font-family:var(--serif);font-size:24px;color:var(--ink);}
+.ov-hd-sub{font-family:var(--mono);font-size:9px;color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;}
+.scope{color:var(--ink3);}
+.ctx{background:var(--bg2);border:1px solid var(--bd2);border-left:3px solid var(--bd3);padding:10px 16px;margin-bottom:20px;font-family:var(--mono);font-size:9px;color:var(--ink2);line-height:1.7;}
+.ctx b{color:var(--ink2);}
 
-/* ── GRIDS ── */
-.g2  { display:grid; grid-template-columns:1fr 1fr;   gap:16px; margin-bottom:16px; }
-.g3  { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px; }
-.g21 { display:grid; grid-template-columns:2fr 1fr;   gap:16px; margin-bottom:16px; }
-.g12 { display:grid; grid-template-columns:1fr 2fr;   gap:16px; margin-bottom:16px; }
-.mb24 { margin-bottom:24px; }
+/* district summary cards — match masthead KPI pattern */
+.dist-cards{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--bd2);border:1px solid var(--bd2);margin-bottom:24px;}
+.dcard{
+  background:var(--bg1);padding:16px 20px 14px;
+  border-top:2px solid transparent;
+  cursor:pointer;transition:background .2s;
+  position:relative;overflow:hidden;
+}
+.dcard:hover{background:var(--bg2);}
+.dcard::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--dc,var(--teal));transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+.dcard:hover::after{transform:scaleX(1);}
+/* city label row */
+.dcard-name{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:var(--ink2);margin-bottom:6px;}
+/* big number */
+.dcard-big{font-family:var(--serif);font-size:26px;line-height:1;color:var(--dc,var(--teal));}
+/* sub label under number */
+.dcard-lbl{font-family:var(--mono);font-size:8px;color:var(--ink3);margin-top:3px;margin-bottom:10px;}
+/* mini progress bar */
+.dcard-bar{height:2px;background:var(--bg3);overflow:hidden;display:flex;gap:1px;margin-bottom:8px;}
+.dcard-bar-fill{height:100%;}
+/* non-compliance rate */
+.dcard-rate-lbl{font-family:var(--mono);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:3px;}
+.dcard-rate{font-family:var(--serif);font-size:18px;line-height:1;}
 
-/* ── CARD ── */
-.card {
-  background:var(--bg1); border:1px solid var(--bd2);
-  border-radius:3px; overflow:hidden; position:relative;
-}
-.card::before {
-  content:''; position:absolute; top:0; left:0; right:0; height:1px;
-  background:linear-gradient(90deg, var(--teal), var(--sky), transparent); opacity:.3;
-}
-.card-hd {
-  padding:12px 18px; border-bottom:1px solid var(--bd);
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-  background:rgba(0,0,0,.15);
-}
-.card-title {
-  font-family:var(--mono); font-size:9px; letter-spacing:1.8px; text-transform:uppercase;
-  color:var(--ink2); font-weight:600;
-  display:flex; align-items:center; gap:8px;
-}
-.card-title-dot { width:5px; height:5px; border-radius:50%; background:var(--teal); box-shadow:0 0 6px var(--teal); }
-.card-meta { font-family:var(--mono); font-size:8px; color:var(--ink4); }
-.card-body { padding:14px 18px; }
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.ov-row3{display:grid;grid-template-columns:200px 1fr 1fr;gap:16px;margin-bottom:16px;}
+.ov-row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.ov-tbl{width:100%;border-collapse:collapse;min-width:560px;}
+.ov-tbl th{font-family:var(--mono);font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);padding:6px 12px;border-bottom:1px solid var(--bd2);text-align:left;white-space:nowrap;position:sticky;top:0;background:var(--bg1);}
+.ov-tbl td{font-family:var(--mono);font-size:8px;color:var(--ink2);padding:5px 12px;border-bottom:1px solid var(--bd);}
+.ov-tbl tr:hover td{background:var(--bg2);}
+.ov-tbl .rank{font-family:var(--serif);font-size:13px;color:var(--ink4);}
+.ov-tbl .city-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+.prov-row{background:var(--bg2);border:1px solid var(--bd2);padding:10px 14px;}
+.prov-name{font-family:var(--mono);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;}
+.prov-stats{display:flex;gap:20px;}
+.prov-stat-val{font-family:var(--serif);font-size:18px;line-height:1;}
+.prov-stat-lbl{font-family:var(--mono);font-size:7px;color:var(--ink4);margin-top:1px;}
+.prov-bar{height:2px;background:var(--bg4);margin-top:8px;overflow:hidden;display:flex;gap:1px;}
+@media(max-width:1200px){.ov-row3{grid-template-columns:180px 1fr 1fr}.ov-row2{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.ov-row3{grid-template-columns:1fr 1fr}.ov-row2{grid-template-columns:1fr}}
+.g1{margin-bottom:16px;}
 
-/* ── TOOLTIP ── */
-#gTooltip {
-  background:var(--bg3) !important;
-  border:1px solid var(--bd3) !important;
-  color:var(--ink) !important;
-  box-shadow:0 8px 32px rgba(0,0,0,.5);
-}
+/* ══ CARD ══ */
+.card{background:var(--bg1);border:1px solid var(--bd2);position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--teal),var(--sky),transparent);opacity:.35;}
+.card-hd{padding:11px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:rgba(0,0,0,.12);}
+.card-title{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:var(--ink2);display:flex;align-items:center;gap:7px;}
+.cdot{width:5px;height:5px;border-radius:50%;background:var(--ink4);}
+.card-meta{font-family:var(--mono);font-size:8px;color:var(--ink4);}
+.card-body{padding:12px 16px;}
 
-/* ── BAR ROWS ── */
-.bar-row {
-  display:flex; align-items:center; gap:10px; padding:5px 0;
-  border-bottom:1px solid var(--bd); cursor:default;
-  transition:background .1s;
+/* ══ DISTRICT VIEW ══ */
+.dist-view{padding-top:28px;}
+.dist-view-hd{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding-bottom:16px;border-bottom:2px solid;
+  margin-bottom:20px;
 }
-.bar-row:hover { background:rgba(255,255,255,.02); }
-.bar-row:last-child { border-bottom:none; }
-/* Labels — now clearly readable */
-.bar-lbl {
-  font-family:var(--mono); font-size:9px;
-  color:var(--ink2);  /* was var(--ink2) but override overrides below */
-  flex:0 0 100px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.bar-lbl.w130 { flex:0 0 130px; }
-.bar-track { flex:1; height:14px; background:var(--bg3); border-radius:2px; overflow:visible; position:relative; }
-.bar-fill { height:100%; border-radius:2px; transition:width .7s ease; position:relative; }
-.bar-stacked { flex:1; height:14px; background:var(--bg3); border-radius:2px; overflow:hidden; display:flex; gap:1px; }
-.bar-seg { height:100%; transition:width .7s; }
-.bar-val { font-family:var(--mono); font-size:9px; font-weight:700; flex:0 0 60px; text-align:right; color:var(--ink); }
-.bar-pct { font-family:var(--mono); font-size:8px; color:var(--ink3); flex:0 0 40px; text-align:right; }
-.bar-inner-lbl {
-  font-family:var(--mono); font-size:7px; font-weight:700;
-  color:rgba(0,0,0,.8); position:absolute; right:4px; top:50%;
-  transform:translateY(-50%); white-space:nowrap; pointer-events:none;
-}
+.dv-title{font-family:var(--serif);font-size:30px;line-height:1;}
+.dv-sub{font-family:var(--mono);font-size:9px;color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;margin-top:5px;}
 
-/* ── ZONE TABLE ── */
-.zone-tbl { width:100%; border-collapse:collapse; }
-.zone-tbl th {
-  font-family:var(--mono); font-size:8px; letter-spacing:1.5px; text-transform:uppercase;
-  color:var(--ink3); padding:0 8px 8px; text-align:right;
-  border-bottom:1px solid var(--bd2); white-space:nowrap;
-  position:sticky; top:0; background:var(--bg2);
-}
-.zone-tbl th:first-child { text-align:left; padding-left:0; }
-.zone-tbl td {
-  font-family:var(--mono); font-size:9px; color:var(--ink2);
-  padding:6px 8px; border-bottom:1px solid var(--bd); text-align:right; vertical-align:middle;
-}
-.zone-tbl td:first-child { text-align:left; padding-left:0; }
-.zone-tbl tr:last-child td { border-bottom:none; }
-.zone-tbl tr:hover td { background:var(--bg2); }
-.zone-code { font-family:var(--mono); font-size:9px; font-weight:700; color:var(--teal); }
+/* district KPI strip */
+.dv-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--bd2);border:1px solid var(--bd2);margin-bottom:20px;}
+.dkpi-cell{background:var(--bg1);padding:14px 18px;position:relative;}
+.dkpi-cell::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--kc);opacity:.4;}
+.dkpi-lbl{font-family:var(--mono);font-size:8px;letter-spacing:1.8px;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;}
+.dkpi-val{font-family:var(--serif);font-size:24px;line-height:1;}
+.dkpi-sub{font-family:var(--mono);font-size:8px;color:var(--ink4);margin-top:3px;}
 
-/* ── CHANGE TABLE ── */
-.chg-table { width:100%; border-collapse:collapse; }
-.chg-table th {
-  font-family:var(--mono); font-size:8px; letter-spacing:1.5px; text-transform:uppercase;
-  color:var(--ink3); padding:0 10px 8px; text-align:right;
-  border-bottom:1px solid var(--bd2); white-space:nowrap;
-}
-.chg-table th:first-child { text-align:left; padding-left:0; }
-.chg-table td {
-  font-family:var(--mono); font-size:9px; color:var(--ink2);
-  padding:7px 10px; border-bottom:1px solid var(--bd); text-align:right; vertical-align:middle;
-}
-.chg-table td:first-child { text-align:left; padding-left:0; font-size:10px; font-weight:600; color:var(--ink); }
-.chg-table tr:last-child td { border-bottom:none; }
-.chg-table tr:hover td { background:var(--bg2); }
+/* ══ BAR ROWS ══ */
+.brow{display:flex;align-items:center;gap:8px;padding:4px 6px;cursor:pointer;transition:background .1s;}
+.brow:hover{background:rgba(255,255,255,.025);}
+.blbl{font-family:var(--mono);font-size:9px;color:var(--ink2);flex:0 0 108px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.btrack{flex:1;height:15px;background:var(--bg3);overflow:hidden;}
+.bfill{height:100%;display:flex;align-items:center;justify-content:flex-end;padding-right:5px;transition:width .6s ease;}
+.bfill-lbl{font-family:var(--mono);font-size:7px;font-weight:700;color:rgba(0,0,0,.85);white-space:nowrap;}
+.bval{font-family:var(--mono);font-size:9px;font-weight:700;flex:0 0 54px;text-align:right;}
+.bpct{font-family:var(--mono);font-size:8px;color:var(--ink3);flex:0 0 36px;text-align:right;}
+.bstacked{flex:1;height:15px;background:var(--bg3);overflow:hidden;display:flex;gap:1px;}
+.bseg{height:100%;transition:width .6s;}
 
-/* ── DL TABLE ── */
-.dl-table-wrap { overflow:auto; max-height:320px; scrollbar-width:thin; scrollbar-color:var(--bg4) transparent; }
-.dl-table-wrap::-webkit-scrollbar { width:3px; height:3px; }
-.dl-table-wrap::-webkit-scrollbar-thumb { background:var(--bg4); }
-.dl-table { width:100%; border-collapse:collapse; min-width:700px; }
-.dl-table th {
-  font-family:var(--mono); font-size:8px; letter-spacing:1.5px; text-transform:uppercase;
-  color:var(--ink3); padding:6px 10px; border-bottom:1px solid var(--bd2);
-  text-align:left; white-space:nowrap; position:sticky; top:0; background:var(--bg2);
-}
-.dl-table td {
-  font-family:var(--mono); font-size:8px; color:var(--ink2);
-  padding:5px 10px; border-bottom:1px solid var(--bd); white-space:nowrap;
-}
-.dl-table tr:hover td { background:var(--bg2); }
-.dl-btn {
-  font-family:var(--mono); font-size:9px; letter-spacing:1.5px; text-transform:uppercase;
-  padding:7px 16px; background:var(--limed); color:var(--lime);
-  border:1px solid rgba(98,201,122,.25); border-radius:2px; cursor:pointer; font-weight:700;
-  transition:all .15s;
-}
-.dl-btn:hover { background:rgba(98,201,122,.15); }
+/* ══ ZONE TABLE ══ */
+.ztbl{width:100%;border-collapse:collapse;}
+.ztbl th{font-family:var(--mono);font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);padding:0 8px 6px;text-align:right;border-bottom:1px solid var(--bd2);white-space:nowrap;position:sticky;top:0;background:var(--bg2);}
+.ztbl th:first-child{text-align:left;padding-left:0;}
+.ztbl td{font-family:var(--mono);font-size:8px;color:var(--ink2);padding:5px 8px;border-bottom:1px solid var(--bd);text-align:right;vertical-align:middle;}
+.ztbl td:first-child{text-align:left;padding-left:0;}
+.ztbl tr:last-child td{border-bottom:none;}
+.ztbl tr:hover td{background:var(--bg2);}
+.zcode{font-family:var(--mono);font-size:8px;font-weight:700;color:var(--teal);}
+.scroll-box{max-height:220px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
+.scroll-box::-webkit-scrollbar{width:3px;}
+.scroll-box::-webkit-scrollbar-thumb{background:var(--bg4);}
 
-/* ── MAP ── */
-.map-div { width:100%; height:380px; background:var(--bg2); }
-.map-legend-bar {
-  display:flex; gap:20px; padding:10px 18px;
-  border-top:1px solid var(--bd); background:var(--bg2);
-  align-items:center;
-}
-.map-key { display:flex; align-items:center; gap:6px; font-family:var(--mono); font-size:9px; color:var(--ink3); letter-spacing:.8px; }
-.map-swatch { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
-.map-hint { font-family:var(--mono); font-size:9px; color:var(--ink4); margin-left:auto; }
+/* ══ MAP ══ */
+.map-div{width:100%;height:380px;background:var(--bg2);}
+.map-foot{display:flex;gap:14px;padding:8px 14px;border-top:1px solid var(--bd);background:var(--bg2);align-items:center;flex-wrap:wrap;}
+.mkey{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:8px;color:var(--ink3);}
+.msw{width:8px;height:8px;flex-shrink:0;}
+.mhint{font-family:var(--mono);font-size:8px;color:var(--ink4);margin-left:auto;}
 
-/* ── OVERVIEW CARDS ── */
-.ov-grid {
-  display:grid; grid-template-columns:repeat(4,1fr);
-  gap:1px; background:var(--bd2); border:1px solid var(--bd2);
-  border-radius:3px; overflow:hidden; margin-bottom:24px;
-}
-.ov-card {
-  background:var(--bg1); padding:18px 20px 16px;
-  cursor:pointer; transition:background .15s;
-  border-top:2px solid transparent; position:relative;
-}
-.ov-card:hover { background:var(--bg2); }
-.ov-name { font-family:var(--serif); font-size:18px; color:var(--ink); margin-bottom:3px; }
-.ov-province { font-family:var(--mono); font-size:8px; color:var(--ink4); letter-spacing:1px; margin-bottom:12px; text-transform:uppercase; }
-.ov-big { font-family:var(--serif); font-size:26px; line-height:1; }
-.ov-lbl { font-family:var(--mono); font-size:8px; color:var(--ink3); letter-spacing:1.5px; text-transform:uppercase; margin-top:3px; margin-bottom:12px; }
-.ov-seg { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; display:flex; gap:1px; margin-bottom:10px; }
-.ov-seg-fill { height:100%; transition:width .8s; }
-.ov-rate-row { display:flex; justify-content:space-between; align-items:baseline; }
-.ov-rate-lbl { font-family:var(--mono); font-size:8px; color:var(--ink3); letter-spacing:1px; text-transform:uppercase; }
-.ov-rate-val { font-family:var(--serif); font-size:16px; font-weight:400; }
+/* ══ DL ══ */
+.dl-wrap{overflow:auto;max-height:240px;scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
+.dl-wrap::-webkit-scrollbar{width:3px;height:3px;}
+.dl-wrap::-webkit-scrollbar-thumb{background:var(--bg4);}
+.dl-tbl{width:100%;border-collapse:collapse;min-width:520px;}
+.dl-tbl th{font-family:var(--mono);font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);padding:5px 10px;border-bottom:1px solid var(--bd2);text-align:left;white-space:nowrap;position:sticky;top:0;background:var(--bg2);}
+.dl-tbl td{font-family:var(--mono);font-size:8px;color:var(--ink2);padding:4px 10px;border-bottom:1px solid var(--bd);white-space:nowrap;}
+.dl-tbl tr:hover td{background:var(--bg2);}
+.btn-dl{display:flex;align-items:center;gap:5px;padding:5px 12px;background:var(--limed);border:1px solid rgba(98,201,122,.25);color:var(--lime);font-family:var(--mono);font-size:8px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .15s;}
+.btn-dl:hover{background:rgba(98,201,122,.15);}
+.btn-dl svg{width:9px;height:9px;stroke:currentColor;fill:none;stroke-width:2.5;}
 
-/* ── SCROLL BOX ── */
-.scroll-box { max-height:280px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--bg4) transparent; }
-.scroll-box::-webkit-scrollbar { width:3px; }
-.scroll-box::-webkit-scrollbar-thumb { background:var(--bg4); }
+/* ══ TOOLTIP ══ */
+#gTip{position:fixed;z-index:9999;pointer-events:none;display:none;background:var(--bg3);border:1px solid var(--bd3);padding:8px 12px;font-family:var(--mono);font-size:9px;color:var(--ink);line-height:1.7;box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:210px;}
 
-/* ── LEVEL SWITCHER ── */
-.lvl-bar { display:flex; background:var(--bg2); border:1px solid var(--bd2); padding:3px; width:fit-content; gap:2px; }
-.lvl-btn {
-  padding:5px 14px; background:none; border:none;
-  color:var(--ink3); font-family:var(--mono); font-size:9px; font-weight:600;
-  letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:all .15s;
+/* ══ ACTIVE FILTER ══ */
+.brow.active{background:rgba(255,255,255,.05);outline:1px solid rgba(255,255,255,.15);}
+.brow.active .blbl{color:var(--ink);}
+.brow.dimmed{opacity:.35;}
+.filter-pill{
+  display:none;align-items:center;gap:8px;
+  padding:4px 10px 4px 12px;
+  background:rgba(232,92,120,.1);border:1px solid rgba(232,92,120,.3);
+  font-family:var(--mono);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--rose);
 }
-.lvl-btn:hover { color:var(--ink2); }
-.lvl-btn.on { background:var(--bg4); color:var(--teal); box-shadow:inset 0 0 0 1px rgba(0,212,184,.2); }
-
-@media(max-width:1100px){ .kpi-row{grid-template-columns:repeat(3,1fr)} .ov-grid{grid-template-columns:repeat(2,1fr)} .g2,.g21,.g12{grid-template-columns:1fr} }
+.filter-pill.show{display:flex;}
+.filter-pill-x{cursor:pointer;font-size:11px;line-height:1;color:var(--rose);padding:0 2px;opacity:.7;transition:opacity .15s;}
+.filter-pill-x:hover{opacity:1;}
+.filter-active-hint{font-family:var(--mono);font-size:8px;color:var(--ink4);letter-spacing:.5px;}
+@media(max-width:900px){.dist-cards{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:1fr}.dv-kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.main{padding:0 14px 60px}.masthead,.filter-bar{padding:0 14px}.dist-cards{grid-template-columns:repeat(2,1fr)}.gkpi-strip{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 
-<!-- MASTHEAD -->
+<!-- ══ MASTHEAD ══ -->
 <div class="masthead">
-  <div class="mh-left">
-    <div class="mh-eyebrow">Change Detection 2023 → 2025</div>
-    <div class="mh-title">Building <em>Monitoring</em> Application</div>
-  </div>
-  <div class="gkpi-row">
-    <div class="gkpi">
-      <div class="gkpi-lbl">Baseline 2023</div>
-      <div class="gkpi-val" style="color:var(--sky)" id="g_base">—</div>
-      <div class="gkpi-sub">Existing buildings</div>
-    </div>
-    <div class="gkpi">
-      <div class="gkpi-lbl">New Detections 2025</div>
-      <div class="gkpi-val" style="color:var(--teal)" id="g_new">—</div>
-      <div class="gkpi-sub">New constructions</div>
-    </div>
-    <div class="gkpi">
-      <div class="gkpi-lbl">Without Permit</div>
-      <div class="gkpi-val" style="color:var(--rose)" id="g_ill">—</div>
-      <div class="gkpi-sub">Illegal new builds</div>
-    </div>
-    <div class="gkpi">
-      <div class="gkpi-lbl">Non-Compliance Rate</div>
-      <div class="gkpi-val" style="color:var(--gold)" id="g_rate">—</div>
-      <div class="gkpi-sub" id="g_rate_sub">of new detections</div>
-    </div>
+  <div>
+    <div class="mh-eyebrow"></div>
+    <div class="mh-title">Building <em>Changes</em> Application</div>
   </div>
 </div>
 
-<!-- FILTER BAR -->
+<!-- ══ STATUS ══ -->
+<div class="sbar gone" id="sbar"><div class="sring"></div><span id="stxt">Loading…</span></div>
+
+<!-- ══ FILTER BAR ══ -->
 <div class="filter-bar">
-  <div class="filter-lbl">
-    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-    Filter
-  </div>
+  <span class="filter-label">District</span>
 
-  <div class="fsel-wrap">
-    <div class="fsel-name">Sector</div>
-    <select class="fsel" id="f_sector" onchange="applyFilters()"><option value="">All</option></select>
-  </div>
-  <div class="fsel-wrap">
-    <div class="fsel-name">Cell</div>
-    <select class="fsel" id="f_cell" onchange="applyFilters()"><option value="">All</option></select>
-  </div>
-  <div class="fsel-wrap">
-    <div class="fsel-name">Village</div>
-    <select class="fsel" id="f_village" onchange="applyFilters()"><option value="">All</option></select>
-  </div>
-  <div class="fsel-wrap">
-    <div class="fsel-name">Zone</div>
-    <select class="fsel" id="f_zone" onchange="applyFilters()"><option value="">All</option></select>
-  </div>
-  <div class="fsel-wrap">
-    <div class="fsel-name">Status</div>
-    <select class="fsel" id="f_legal" onchange="applyFilters()">
-      <option value="">All</option>
-      <option value="Illegal">Illegal</option>
-      <option value="Legal">Legal</option>
-      <option value="Existing">Existing</option>
+  <div class="sel-wrap">
+    <span class="sel-dot" id="selDot" style="background:var(--teal)"></span>
+    <select class="dist-select" id="distSelect" onchange="onDistChange(this.value)">
+      <option value="overview">Cities — Overview</option>
     </select>
-  </div>
-  <div class="fsel-wrap">
-    <div class="fsel-name">Year</div>
-    <select class="fsel" id="f_year" onchange="applyFilters()">
-      <option value="">All</option>
-      <option value="2023_Cities">2023 Baseline</option>
-      <option value="2025">2025 New</option>
-    </select>
+    <span class="sel-arrow"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
   </div>
 
-  <button class="filter-reset" onclick="resetFilters()">
-    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    Reset
-  </button>
-  <div class="filter-count" id="filterCount"></div>
-</div>
+  <div class="filter-divider"></div>
 
-<!-- STATUS BAR -->
-<div class="sbar gone" id="sbar">
-  <div class="sring"></div>
-  <span id="stxt">Loading…</span>
-</div>
+  <div class="view-indicator">
+    <span class="view-dot" id="viewDot" style="background:var(--teal)"></span>
+    <div>
+      <div class="view-name" id="viewName">Secondary &amp; Satellite Cities</div>
+      <div class="view-sub" id="viewSub">Overview — 7 Secondary & Satellite Cities</div>
+    </div>
+  </div>
 
-<!-- TAB BAR -->
-<div class="tab-bar" id="tabBar">
-  <button class="tab on" onclick="showTab('all')" id="tab_all">
-    <span class="tab-dot" style="background:var(--teal)"></span>
-    All Districts
-    <span class="tbadge" id="badge_all">7</span>
+  <button class="btn-back" id="btnBack" onclick="onDistChange('overview')">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Cities
   </button>
 </div>
 
-<!-- MAIN -->
+<!-- ══ MAIN ══ -->
 <div class="main">
 
-  <!-- ═══ ALL DISTRICTS ═══ -->
-  <div class="city-view on" id="view_all">
-    <div class="page-hd">
-      <div>
-        <div class="page-title">All Urban Districts</div>
-        <div class="page-sub">7 DISTRICTS · <span class="scope-tag">Urbanized sectors only — not full district area</span></div>
+  <!-- OVERVIEW VIEW -->
+  <div class="view active" id="view_overview">
+    <div class="overview">
+      <div class="ov-hd">
+        <div class="ov-hd-title">Secondary & Satellite Cities</div>
+        <div class="ov-hd-sub">7 CITIES · <span class="scope">Rwanda</span></div>
       </div>
-    </div>
 
-    <div class="context-notice">
-      <strong>Scope notice</strong> — This analysis covers only the urbanized sectors within each district where 2025 satellite imagery was acquired.
-      The 2023 baseline represents buildings detected within those specific sectors. New 2025 detections are compared against that baseline only.
-      This is NOT a full district-wide inventory.
-    </div>
-
-    <div class="ov-grid" id="ovGrid"></div>
-
-    <div class="g2 mb24">
-      <div class="card">
-        <div class="card-hd">
-          <div class="card-title"><span class="card-title-dot"></span>New Detections 2025 — by District</div>
-          <div class="card-meta">Legal (teal) · Illegal (rose)</div>
+      <!-- Global KPI strip — 5 cells -->
+      <div class="gkpi-strip" style="grid-template-columns:repeat(5,1fr)">
+        <div class="gkpi-cell" style="--kc:var(--sky)">
+          <div class="gkpi-lbl">Total Buildings</div>
+          <div class="gkpi-val" style="color:var(--sky)" id="g_base">—</div>
         </div>
-        <div class="card-body" id="cmpBars"></div>
-      </div>
-      <div class="card">
-        <div class="card-hd">
-          <div class="card-title"><span class="card-title-dot" style="background:var(--rose);box-shadow:0 0 6px var(--rose)"></span>Non-Compliance Ranking</div>
-          <div class="card-meta">% of new builds without permit</div>
+        <div class="gkpi-cell" style="--kc:var(--teal)">
+          <div class="gkpi-lbl">New 2025</div>
+          <div class="gkpi-val" style="color:var(--teal)" id="g_new">—</div>
         </div>
-        <div class="card-body" id="riskBars"></div>
+        <div class="gkpi-cell" style="--kc:var(--lime)">
+          <div class="gkpi-lbl">With Permit</div>
+          <div class="gkpi-val" style="color:var(--lime)" id="g_leg">—</div>
+        </div>
+        <div class="gkpi-cell" style="--kc:var(--rose)">
+          <div class="gkpi-lbl">Without Permit</div>
+          <div class="gkpi-val" style="color:var(--rose)" id="g_ill">—</div>
+        </div>
+        <div class="gkpi-cell" style="--kc:var(--gold)">
+          <div class="gkpi-lbl">Non-Compliance</div>
+          <div class="gkpi-val" style="color:var(--gold)" id="g_rate">—</div>
+        </div>
       </div>
+
+      <!-- ROW 1: Donut + New Builds by City + Zone Code chart -->
+      <div class="ov-row3">
+
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title"><span class="cdot"></span>Permit Compliance</div>
+            <div class="card-meta">All new constructions 2025</div>
+          </div>
+          <div class="card-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px 16px;">
+            <div style="position:relative;width:140px;height:140px;flex-shrink:0;">
+              <svg id="ov_donut" width="140" height="140" viewBox="0 0 140 140"></svg>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+                <div id="ov_donut_pct" style="font-family:var(--serif);font-size:26px;color:var(--rose);line-height:1;">—</div>
+                <div style="font-family:var(--mono);font-size:7px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;margin-top:2px;">No Permit</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:16px;font-family:var(--mono);font-size:8px;">
+              <span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--rose);display:inline-block;"></span><span style="color:var(--ink2)">Without Permit</span></span>
+              <span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block;"></span><span style="color:var(--ink2)">With Permit</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title"><span class="cdot"></span>New Constructions by City</div>
+            <div class="card-meta">With Permit · Without Permit</div>
+          </div>
+          <div class="card-body scroll-box" id="ov_newbars" style="display:flex;flex-direction:column;gap:3px;"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title"><span class="cdot"></span>New Constructions by Zone Code</div>
+            <div class="card-meta">With Permit · Without Permit · all cities</div>
+          </div>
+          <div class="card-body scroll-box" id="ov_zonebars" style="display:flex;flex-direction:column;gap:3px;"></div>
+        </div>
+
+      </div>
+
+      <!-- ROW 2: Two pies + CSV Export -->
+      <div class="ov-row3" style="grid-template-columns:1fr 1fr 2fr">
+
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title"><span class="cdot"></span>Land Use Breakdown</div>
+            <div class="card-meta">New constructions 2025</div>
+          </div>
+          <div class="card-body" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+            <div style="position:relative;width:120px;height:120px;flex-shrink:0;">
+              <svg id="ov_lupie" width="120" height="120" viewBox="0 0 120 120"></svg>
+            </div>
+            <div id="ov_lulegend" style="display:flex;flex-direction:column;gap:5px;font-family:var(--mono);font-size:8px;flex:1;min-width:80px;"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title"><span class="cdot"></span>New Constructions by Zoning Type</div>
+            <div class="card-meta">All cities 2025</div>
+          </div>
+          <div class="card-body" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+            <div style="position:relative;width:120px;height:120px;flex-shrink:0;">
+              <svg id="ov_citypie" width="120" height="120" viewBox="0 0 120 120"></svg>
+            </div>
+            <div id="ov_citypielegend" style="display:flex;flex-direction:column;gap:5px;font-family:var(--mono);font-size:8px;flex:1;min-width:80px;"></div>
+          </div>
+        </div>
+
+        <!-- CSV Export table -->
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title"><span class="cdot"></span>Data Export — Cities</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span class="card-meta" id="ov_dlcount">—</span>
+              <button class="btn-dl" onclick="downloadOvCSV()">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>CSV
+              </button>
+            </div>
+          </div>
+          <div class="dl-wrap">
+            <table class="dl-tbl">
+              <thead><tr>
+                <th>UPI</th><th>City</th><th>Sector</th><th>Cell</th><th>Village</th><th>Zone Code</th><th style="text-align:right">With Permit</th><th style="text-align:right">Without Permit</th>
+              </tr></thead>
+              <tbody id="ov_dltbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </div>
 
-  <!-- ═══ DISTRICT VIEWS ═══ -->
-  <div id="cityViews"></div>
+  <!-- DISTRICT VIEWS (one per district, built dynamically) -->
+  <div id="distViews"></div>
+
 </div>
 
-<!-- GLOBAL TOOLTIP -->
-<div id="gTooltip" style="display:none;position:fixed;background:var(--bg3);border:1px solid var(--bd3);border-radius:3px;padding:8px 13px;font-family:var(--mono);font-size:9px;color:var(--ink);z-index:1000;pointer-events:none;line-height:1.7;box-shadow:0 8px 32px rgba(0,0,0,.5);"></div>
+<div id="gTip"></div>
 
 <script>
-// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 //  CONFIG
-// ══════════════════════════════════════════════════════════════
-const ORG = 'https://services7.arcgis.com/htgaiKX6RV2DDGgK/arcgis/rest/services';
-
-// Per-district WebMap IDs
-const WEBMAP_IDS = {
-  kayonza:   'b6f2526893bc45f681b1581a568a5422',
-  kirehe:    '404cca31c06c431e903c2cbe2ec78c21',
-  nyagatare: 'c4ad87443d22486c80ba24334418ef20',
-  huye:      '941cdf4230074a45ad3c01a620a84c82',
-  rubavu:    '70054aa12c7147aaaac58f4f25a976d1',
-  musanze:   '7918089a934d45839b145de29c3d908c',
-  rusizi:    '65ca0a639f1c41a888e85904b96c52c7',
-};
-
-const CITIES = [
-  {id:'kayonza',   label:'Kayonza',   color:'#00d4b8', province:'Eastern Province',  svc:`${ORG}/Building_Kayonza_urban/FeatureServer/0`},
-  {id:'kirehe',    label:'Kirehe',    color:'#4ab0e8', province:'Eastern Province',  svc:`${ORG}/Construction_Kirehe_Cities/FeatureServer/0`},
-  {id:'nyagatare', label:'Nyagatare', color:'#00b89e', province:'Eastern Province',  svc:`${ORG}/Construction_Nyagatare_Cities/FeatureServer/0`},
-  {id:'huye',      label:'Huye',      color:'#e8b84b', province:'Southern Province', svc:`${ORG}/Buildings_Huye_Cities/FeatureServer/0`},
-  {id:'rubavu',    label:'Rubavu',    color:'#62c97a', province:'Western Province',  svc:`${ORG}/Buildings_Rubavu_Cities/FeatureServer/0`},
-  {id:'musanze',   label:'Musanze',   color:'#e85c78', province:'Northern Province', svc:`${ORG}/Building_Musanze_Cities/FeatureServer/0`},
-  {id:'rusizi',    label:'Rusizi',    color:'#7faacc', province:'Western Province',  svc:`${ORG}/Buildings_Rusizi_Cities/FeatureServer/0`},
+// ══════════════════════════════════════════════════════
+const ORG='https://services7.arcgis.com/htgaiKX6RV2DDGgK/arcgis/rest/services';
+const WEBMAP_IDS={kayonza:'b6f2526893bc45f681b1581a568a5422',kirehe:'404cca31c06c431e903c2cbe2ec78c21',nyagatare:'c4ad87443d22486c80ba24334418ef20',huye:'941cdf4230074a45ad3c01a620a84c82',rubavu:'70054aa12c7147aaaac58f4f25a976d1',musanze:'7918089a934d45839b145de29c3d908c',rusizi:'65ca0a639f1c41a888e85904b96c52c7'};
+const CITIES=[
+  {id:'kayonza',  label:'Kayonza',  color:'#00d4b8',province:'Eastern',  svc:`${ORG}/Building_Kayonza_urban/FeatureServer/0`},
+  {id:'kirehe',   label:'Kirehe',   color:'#4ab0e8',province:'Eastern',  svc:`${ORG}/Construction_Kirehe_Cities/FeatureServer/0`},
+  {id:'nyagatare',label:'Nyagatare',color:'#00b89e',province:'Eastern',  svc:`${ORG}/Construction_Nyagatare_Cities/FeatureServer/0`},
+  {id:'huye',     label:'Huye',     color:'#e8b84b',province:'Southern', svc:`${ORG}/Buildings_Huye_Cities/FeatureServer/0`},
+  {id:'rubavu',   label:'Rubavu',   color:'#62c97a',province:'Western',  svc:`${ORG}/Buildings_Rubavu_Cities/FeatureServer/0`},
+  {id:'musanze',  label:'Musanze',  color:'#e85c78',province:'Northern', svc:`${ORG}/Building_Musanze_Cities/FeatureServer/0`},
+  {id:'rusizi',   label:'Rusizi',   color:'#7faacc',province:'Western',  svc:`${ORG}/Buildings_Rusizi_Cities/FeatureServer/0`},
 ];
+const F={LEGAL:'legal_t',SECTOR:'sector',CELL:'cell',VILLAGE:'village',ZONE:'zone_code',ZONING:'zoning',GENLU:'gen_lu'};
+const D={};
+CITIES.forEach(c=>{D[c.id]={loaded:false,baseline:0,newTotal:0,illegal:0,legal:0,bySector:{},byCell:{},byVillage:{},byZone:{},byGenLu:{},dlRows:[]};});
 
-const F = {
-  LEGAL:   'legal_t',
-  YEAR:    'year_t',
-  STATUS:  'status_t',
-  SECTOR:  'sector',
-  CELL:    'cell',
-  VILLAGE: 'village',
-  ZONE:    'zone_code',
-  ZONING:  'zoning',
-  GENLU:   'gen_lu',
-};
+const $=id=>document.getElementById(id);
+const fmt=n=>Number(n||0).toLocaleString();
+const pct=(a,b)=>b>0?(a/b*100).toFixed(1)+'%':'—';
+const pctN=(a,b)=>b>0?parseFloat((a/b*100).toFixed(1)):0;
 
-let activeFilters = {sector:'', cell:'', village:'', zone:'', legal:'', year:''};
-let currentCity = null;
+// Tooltip
+const gTip=$('gTip');
+function showTip(e,h){gTip.innerHTML=h;gTip.style.display='block';moveTip(e);}
+function moveTip(e){gTip.style.left=Math.min(e.clientX+14,window.innerWidth-230)+'px';gTip.style.top=Math.max(e.clientY-gTip.offsetHeight-6,4)+'px';}
+function hideTip(){gTip.style.display='none';}
+document.addEventListener('mousemove',e=>{if(gTip.style.display!=='none')moveTip(e);});
+function tip(el,h){el.addEventListener('mouseenter',e=>showTip(e,h));el.addEventListener('mouseleave',hideTip);}
 
-const D = {};
-CITIES.forEach(c => {
-  D[c.id] = {
-    loaded: false, baseline: 0, newTotal: 0, illegal: 0, legal: 0,
-    bySector: {}, byCell: {}, byVillage: {}, byZone: {}, byGenLu: {},
-    allSectors: new Set(), allZones: new Set(), rawRows: [], dlRows: []
-  };
-});
-
-const $ = id => document.getElementById(id);
-const fmt = n => Number(n||0).toLocaleString();
-const pct = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '—';
-const pctN = (a,b) => b>0 ? parseFloat((a/b*100).toFixed(1)) : 0;
-
-// ── Tooltip
-const gTip = $('gTooltip');
-function showTip(e, html){ gTip.innerHTML=html; gTip.style.display='block'; moveTip(e); }
-function moveTip(e){ gTip.style.left=Math.min(e.clientX+14,window.innerWidth-220)+'px'; gTip.style.top=Math.max(e.clientY-10-gTip.offsetHeight,4)+'px'; }
-function hideTip(){ gTip.style.display='none'; }
-document.addEventListener('mousemove', e => { if(gTip.style.display!=='none') moveTip(e); });
-function attachBarTip(el, html){
-  el.addEventListener('mouseenter', e => showTip(e, html));
-  el.addEventListener('mouseleave', hideTip);
-}
-
-// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 //  API
-// ══════════════════════════════════════════════════════════════
-async function qStat(svc, where, groupBy){
-  const body = new URLSearchParams();
-  body.set('where', where||'1=1');
-  body.set('groupByFieldsForStatistics', groupBy);
+// ══════════════════════════════════════════════════════
+async function qStat(svc,where,groupBy){
+  const body=new URLSearchParams();
+  body.set('where',where||'1=1');body.set('groupByFieldsForStatistics',groupBy);
   body.set('outStatistics','[{"statisticType":"count","onStatisticField":"OBJECTID","outStatisticFieldName":"cnt"}]');
-  body.set('returnGeometry','false');
-  body.set('f','json');
-  try {
-    const r = await fetch(svc+'/query',{method:'POST',body,headers:{'Content-Type':'application/x-www-form-urlencoded'}});
-    const j = await r.json();
-    if(j.error) throw new Error(j.error.message);
-    return j.features||[];
-  } catch(e){ console.warn('qStat',groupBy,e.message); return []; }
+  body.set('returnGeometry','false');body.set('f','json');
+  try{const r=await fetch(svc+'/query',{method:'POST',body,headers:{'Content-Type':'application/x-www-form-urlencoded'}});const j=await r.json();if(j.error)throw new Error(j.error.message);return j.features||[];}
+  catch(e){console.warn(e.message);return[];}
 }
 
-function buildWhere(extraWhere){
-  const parts = [];
-  if(activeFilters.sector) parts.push(`${F.SECTOR}='${activeFilters.sector.replace(/'/g,"''")}'`);
-  if(activeFilters.zone)   parts.push(`${F.ZONE}='${activeFilters.zone}'`);
-  if(activeFilters.legal)  parts.push(`${F.LEGAL}='${activeFilters.legal}'`);
-  if(activeFilters.year)   parts.push(`${F.YEAR}='${activeFilters.year}'`);
-  if(extraWhere)           parts.push(extraWhere);
-  return parts.length ? parts.join(' AND ') : '1=1';
-}
-
-// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 //  LOAD
-// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 async function loadCity(city){
-  const d = D[city.id];
+  const d=D[city.id];
   setStatus(`${city.label} · loading…`);
-
-  const r1 = await qStat(city.svc,'1=1',`${F.SECTOR},${F.LEGAL}`);
-  r1.forEach(f => {
-    const sec=f.attributes[F.SECTOR]||'Unknown', lt=f.attributes[F.LEGAL]||'Unknown', cnt=f.attributes.cnt||0;
-    if(!d.bySector[sec]) d.bySector[sec]={baseline:0,illegal:0,legal:0};
-    if(lt==='Existing') { d.bySector[sec].baseline+=cnt; d.baseline+=cnt; }
-    if(lt==='Illegal')  { d.bySector[sec].illegal+=cnt;  d.newTotal+=cnt; d.illegal+=cnt; }
-    if(lt==='Legal')    { d.bySector[sec].legal+=cnt;    d.newTotal+=cnt; d.legal+=cnt; }
-    d.allSectors.add(sec);
-  });
-
-  const r2 = await qStat(city.svc,'1=1',`${F.CELL},${F.LEGAL}`);
-  r2.forEach(f => {
-    const cel=f.attributes[F.CELL]||'Unknown', lt=f.attributes[F.LEGAL]||'Unknown', cnt=f.attributes.cnt||0;
-    if(!d.byCell[cel]) d.byCell[cel]={baseline:0,illegal:0,legal:0};
-    if(lt==='Existing') d.byCell[cel].baseline+=cnt;
-    if(lt==='Illegal')  d.byCell[cel].illegal+=cnt;
-    if(lt==='Legal')    d.byCell[cel].legal+=cnt;
-  });
-
-  const r3 = await qStat(city.svc,`${F.LEGAL}<>'Existing'`,`${F.VILLAGE},${F.LEGAL}`);
-  r3.forEach(f => {
-    const vil=f.attributes[F.VILLAGE]||'Unknown', lt=f.attributes[F.LEGAL]||'Unknown', cnt=f.attributes.cnt||0;
-    if(!d.byVillage[vil]) d.byVillage[vil]={illegal:0,legal:0};
-    if(lt==='Illegal') d.byVillage[vil].illegal+=cnt;
-    if(lt==='Legal')   d.byVillage[vil].legal+=cnt;
-  });
-
-  const r4 = await qStat(city.svc,'1=1',`${F.ZONE},${F.LEGAL},${F.ZONING}`);
-  r4.forEach(f => {
-    const zc=f.attributes[F.ZONE]||'Unknown', lt=f.attributes[F.LEGAL]||'Unknown', zn=f.attributes[F.ZONING]||'', cnt=f.attributes.cnt||0;
-    if(!d.byZone[zc]) d.byZone[zc]={baseline:0,illegal:0,legal:0,label:zn};
-    if(lt==='Existing') d.byZone[zc].baseline+=cnt;
-    if(lt==='Illegal')  d.byZone[zc].illegal+=cnt;
-    if(lt==='Legal')    { d.byZone[zc].label=zn; d.byZone[zc].legal+=cnt; }
-    d.allZones.add(zc);
-  });
-
-  const r5 = await qStat(city.svc,`${F.LEGAL}<>'Existing'`,`${F.GENLU},${F.LEGAL}`);
-  r5.forEach(f => {
-    const lu=f.attributes[F.GENLU]||'Unknown', lt=f.attributes[F.LEGAL]||'Unknown', cnt=f.attributes.cnt||0;
-    if(!d.byGenLu[lu]) d.byGenLu[lu]={illegal:0,legal:0};
-    if(lt==='Illegal') d.byGenLu[lu].illegal+=cnt;
-    if(lt==='Legal')   d.byGenLu[lu].legal+=cnt;
-  });
-
-  d.loaded = true;
-  $(`badge_${city.id}`).textContent = fmt(d.newTotal);
-  populateFilterDropdowns(city, d);
-  renderCity(city);
-  renderAllView();
+  const r1=await qStat(city.svc,'1=1',`${F.SECTOR},${F.LEGAL}`);
+  r1.forEach(f=>{const s=f.attributes[F.SECTOR]||'Unknown',lt=f.attributes[F.LEGAL]||'Unknown',cnt=f.attributes.cnt||0;if(!d.bySector[s])d.bySector[s]={baseline:0,illegal:0,legal:0};if(lt==='Existing'){d.bySector[s].baseline+=cnt;d.baseline+=cnt;}if(lt==='Illegal'){d.bySector[s].illegal+=cnt;d.newTotal+=cnt;d.illegal+=cnt;}if(lt==='Legal'){d.bySector[s].legal+=cnt;d.newTotal+=cnt;d.legal+=cnt;}});
+  const r2=await qStat(city.svc,'1=1',`${F.CELL},${F.LEGAL}`);
+  r2.forEach(f=>{const c=f.attributes[F.CELL]||'Unknown',lt=f.attributes[F.LEGAL]||'Unknown',cnt=f.attributes.cnt||0;if(!d.byCell[c])d.byCell[c]={baseline:0,illegal:0,legal:0};if(lt==='Existing')d.byCell[c].baseline+=cnt;if(lt==='Illegal')d.byCell[c].illegal+=cnt;if(lt==='Legal')d.byCell[c].legal+=cnt;});
+  const r3=await qStat(city.svc,`${F.LEGAL}<>'Existing'`,`${F.VILLAGE},${F.LEGAL}`);
+  r3.forEach(f=>{const v=f.attributes[F.VILLAGE]||'Unknown',lt=f.attributes[F.LEGAL]||'Unknown',cnt=f.attributes.cnt||0;if(!d.byVillage[v])d.byVillage[v]={illegal:0,legal:0};if(lt==='Illegal')d.byVillage[v].illegal+=cnt;if(lt==='Legal')d.byVillage[v].legal+=cnt;});
+  const r4=await qStat(city.svc,'1=1',`${F.ZONE},${F.LEGAL},${F.ZONING}`);
+  r4.forEach(f=>{const zc=f.attributes[F.ZONE]||'Unknown',lt=f.attributes[F.LEGAL]||'Unknown',zn=f.attributes[F.ZONING]||'',cnt=f.attributes.cnt||0;if(!d.byZone[zc])d.byZone[zc]={baseline:0,illegal:0,legal:0,label:zn};if(lt==='Existing')d.byZone[zc].baseline+=cnt;if(lt==='Illegal')d.byZone[zc].illegal+=cnt;if(lt==='Legal'){d.byZone[zc].label=zn;d.byZone[zc].legal+=cnt;}});
+  const r5=await qStat(city.svc,`${F.LEGAL}<>'Existing'`,`${F.GENLU},${F.LEGAL}`);
+  r5.forEach(f=>{const lu=f.attributes[F.GENLU]||'Unknown',lt=f.attributes[F.LEGAL]||'Unknown',cnt=f.attributes.cnt||0;if(!d.byGenLu[lu])d.byGenLu[lu]={illegal:0,legal:0};if(lt==='Illegal')d.byGenLu[lu].illegal+=cnt;if(lt==='Legal')d.byGenLu[lu].legal+=cnt;});
+  d.loaded=true;
+  renderOverview();
+  fillDistView(city);
   updateGlobalKpis();
 }
 
-function populateFilterDropdowns(city, d){
-  const addOpt = (selId, val) => {
-    const sel=$(selId); if(!sel) return;
-    if(![...sel.options].some(o=>o.value===val)){
-      const o=document.createElement('option'); o.value=val; o.textContent=val; sel.appendChild(o);
-    }
-  };
-  [...d.allSectors].sort().forEach(s => addOpt('f_sector', s));
-  [...d.allZones].sort().forEach(z   => addOpt('f_zone', z));
-  Object.keys(d.byCell).sort().forEach(c    => addOpt('f_cell', c));
-  Object.keys(d.byVillage).sort().forEach(v => addOpt('f_village', v));
+// ══════════════════════════════════════════════════════
+//  BARS
+// ══════════════════════════════════════════════════════
+function mkStacked(label,illegal,legal,maxVal,tipHtml,color=''){
+  const iW=maxVal>0?pctN(illegal,maxVal):0,lW=maxVal>0?pctN(legal,maxVal):0;
+  const d=document.createElement('div');d.className='brow';
+  d.innerHTML=`<span class="blbl">${label}</span><div class="bstacked"><div class="bseg" style="width:${lW}%;background:rgba(0,212,184,.65)"></div><div class="bseg" style="width:${iW}%;background:rgba(232,92,120,.65)"></div></div><span class="bpct">${fmt(illegal+legal)}</span>`;
+  tip(d,tipHtml);return d;
+}
+function mkBar(label,val,maxVal,color,tipHtml,suffix=''){
+  const w=maxVal>0?Math.max(pctN(val,maxVal),0.3):0;
+  const d=document.createElement('div');d.className='brow';
+  d.innerHTML=`<span class="blbl">${label}</span><div class="btrack"><div class="bfill" style="width:${w}%;background:${color}"><span class="bfill-lbl">${val>0?fmt(val):''}</span></div></div><span class="bval" style="color:${color}">${suffix||fmt(val)}</span>`;
+  tip(d,tipHtml);return d;
 }
 
-// ══════════════════════════════════════════════════════════════
-//  FILTERS
-// ══════════════════════════════════════════════════════════════
-function applyFilters(){
-  activeFilters.sector  = $('f_sector').value;
-  activeFilters.cell    = $('f_cell').value;
-  activeFilters.village = $('f_village').value;
-  activeFilters.zone    = $('f_zone').value;
-  activeFilters.legal   = $('f_legal').value;
-  activeFilters.year    = $('f_year').value;
-  const active = Object.values(activeFilters).filter(Boolean).length;
-  $('filterCount').textContent = active ? `${active} active` : '';
-  if(currentCity==='all') renderAllView();
-  else if(currentCity){ const city=CITIES.find(c=>c.id===currentCity); if(city) renderCity(city); }
-  updateMapFilter(); // includes zoom
+// ══════════════════════════════════════════════════════
+//  OVERVIEW RENDERS
+// ══════════════════════════════════════════════════════
+function renderOverview(){
+  renderDonut();
+  renderNewBars();
+  renderZoneBars();
+  renderLuPie();
+  renderZoningPie();
+  renderOvTable();
 }
 
-function resetFilters(){
-  ['f_sector','f_cell','f_village','f_zone','f_legal','f_year'].forEach(id=>{const el=$(id);if(el)el.value='';});
-  activeFilters={sector:'',cell:'',village:'',zone:'',legal:'',year:''};
-  $('filterCount').textContent='';
-  if(currentCity==='all') renderAllView();
-  else if(currentCity){ const city=CITIES.find(c=>c.id===currentCity); if(city) renderCity(city); }
-  updateMapFilter();
-}
-
-function filteredSectors(d){ return Object.entries(d.bySector).filter(([sec])=>!activeFilters.sector||sec===activeFilters.sector); }
-function filteredCells(d)  { return Object.entries(d.byCell).filter(([cel])=>!activeFilters.cell||cel===activeFilters.cell); }
-function filteredZones(d)  { return Object.entries(d.byZone).filter(([zc])=>!activeFilters.zone||zc===activeFilters.zone); }
-
-function getFilteredTotals(d){
-  let base=d.baseline, ill=d.illegal, leg=d.legal;
-  if(activeFilters.sector){
-    base=ill=leg=0;
-    filteredSectors(d).forEach(([,v])=>{ base+=v.baseline; ill+=v.illegal; leg+=v.legal; });
+function renderDonut(){
+  const svg=$('ov_donut');if(!svg)return;
+  let ill=0,leg=0;CITIES.forEach(c=>{ill+=D[c.id].illegal;leg+=D[c.id].legal;});
+  const tot=ill+leg;if(!tot)return;
+  const R=54,ri=36,cx=70,cy=70;
+  function arc(startA,sweep,color){
+    if(sweep<=0)return'';
+    const endA=startA+sweep;
+    const x1=cx+R*Math.sin(startA),y1=cy-R*Math.cos(startA);
+    const x2=cx+R*Math.sin(endA),y2=cy-R*Math.cos(endA);
+    const lf=sweep>Math.PI?1:0;
+    return`<path d="M${cx},${cy} L${x1},${y1} A${R},${R} 0 ${lf},1 ${x2},${y2} Z" fill="${color}" opacity=".85"/>`;
   }
-  if(activeFilters.legal==='Illegal') { leg=0; }
-  else if(activeFilters.legal==='Legal') { ill=0; }
-  else if(activeFilters.legal==='Existing') { ill=0; leg=0; }
-  return { base, ill, leg, newT: ill+leg };
+  const illSweep=ill/tot*Math.PI*2;
+  const legSweep=leg/tot*Math.PI*2;
+  svg.innerHTML=
+    `<circle cx="${cx}" cy="${cy}" r="${R}" fill="var(--bg2)"/>` +
+    arc(0, illSweep, 'var(--rose)') +
+    arc(illSweep, legSweep, 'var(--teal)') +
+    `<circle cx="${cx}" cy="${cy}" r="${ri}" fill="var(--bg1)"/>`;
+  $('ov_donut_pct').textContent=pctN(ill,tot).toFixed(1)+'%';
 }
 
-// ══════════════════════════════════════════════════════════════
-//  RENDER HELPERS — all bars are clickable → filter map
-// ══════════════════════════════════════════════════════════════
-
-// Active filter ring: highlights bar if its value matches active filter
-const ACTIVE_RING='box-shadow:0 0 0 2px rgba(0,212,184,.8);outline:1px solid rgba(0,212,184,.4);';
-
-function barRow(label, val, maxVal, color, tooltip, extra='', clickFn=null, filterField=null, filterVal=null){
-  const w = maxVal>0 ? Math.max(pctN(val,maxVal),0.5) : 0;
-  const active = filterField && filterVal && isActive(filterField, filterVal);
-  const div = document.createElement('div');
-  div.className='bar-row';
-  if(clickFn) { div.style.cursor='pointer'; if(active) div.style.cssText+=ACTIVE_RING; }
-  div.innerHTML=`
-    <span class="bar-lbl">${label}</span>
-    <div class="bar-track">
-      <div class="bar-fill" style="width:${w}%;background:${color}${active?';filter:brightness(1.25)':''}">
-        <span class="bar-inner-lbl">${val>0?fmt(val):''}</span>
-      </div>
-    </div>
-    <span class="bar-val" style="color:${color}">${fmt(val)}</span>
-    ${extra}`;
-  attachBarTip(div, tooltip+(clickFn?'<br><span style="color:var(--teal);font-size:8px">▶ Click to filter map</span>':''));
-  if(clickFn) div.addEventListener('click', ()=>{ hideTip(); clickFn(filterVal); });
-  return div;
-}
-
-function stackedBarRow(label, illegal, legal, maxVal, color, tooltip, clickFn=null, filterField=null, filterVal=null){
-  const iW = maxVal>0 ? pctN(illegal,maxVal) : 0;
-  const lW = maxVal>0 ? pctN(legal,maxVal) : 0;
-  const active = filterField && filterVal && isActive(filterField, filterVal);
-  const div = document.createElement('div');
-  div.className='bar-row';
-  if(clickFn){ div.style.cursor='pointer'; if(active) div.style.cssText+=ACTIVE_RING; }
-  div.innerHTML=`
-    <span class="bar-lbl w130">${label}</span>
-    <div class="bar-stacked">
-      <div class="bar-seg seg-legal"  style="width:${lW}%;background:rgba(0,212,184,.65)"  title="Legal: ${fmt(legal)}"></div>
-      <div class="bar-seg seg-illegal" style="width:${iW}%;background:rgba(232,92,120,.65)" title="Illegal: ${fmt(illegal)}"></div>
-    </div>
-    <span class="bar-pct">${fmt(illegal+legal)}</span>`;
-
-  // Attach tooltip to whole row
-  attachBarTip(div, tooltip+(clickFn?'<br><span style="color:var(--teal);font-size:8px">▶ Click bar segment to filter map</span>':''));
-
-  // Make individual segments clickable with their own filter
-  if(clickFn){
-    const legalSeg  = div.querySelector('.seg-legal');
-    const illegalSeg= div.querySelector('.seg-illegal');
-    legalSeg.style.cursor='pointer';
-    illegalSeg.style.cursor='pointer';
-    legalSeg.addEventListener('click', e=>{ e.stopPropagation(); hideTip(); filterMapByLegal('Legal'); });
-    illegalSeg.addEventListener('click', e=>{ e.stopPropagation(); hideTip(); filterMapByLegal('Illegal'); });
-    // Whole row click → filter by district/sector/cell
-    div.addEventListener('click', ()=>{ hideTip(); clickFn(filterVal); });
-  }
-  return div;
-}
-
-// ══════════════════════════════════════════════════════════════
-//  ALL VIEW
-// ══════════════════════════════════════════════════════════════
-function renderAllView(){ renderOvCards(); renderCmpBars(); renderRiskBars(); }
-
-function renderOvCards(){
-  const el=$('ovGrid'); if(!el) return;
-  el.innerHTML = CITIES.map(dist => {
-    const d=D[dist.id], {ill,leg,newT}=getFilteredTotals(d);
-    const illPct=pctN(ill,newT);
-    const rCol=illPct>90?'var(--rose)':illPct>70?'var(--gold)':'var(--lime)';
-    return `<div class="ov-card" onclick="showTab('${dist.id}')" style="border-top-color:${dist.color}">
-      <div class="ov-name">${dist.label}</div>
-      <div class="ov-province">${dist.province}</div>
-      <div class="ov-big" style="color:${dist.color}">${fmt(newT)}</div>
-      <div class="ov-lbl">New Detections 2025</div>
-      <div class="ov-seg">
-        <div class="ov-seg-fill" style="width:${pctN(leg,newT)}%;background:var(--teal)"></div>
-        <div class="ov-seg-fill" style="width:${pctN(ill,newT)}%;background:var(--rose)"></div>
-      </div>
-      <div class="ov-rate-row">
-        <span class="ov-rate-lbl">Non-Compliance</span>
-        <span class="ov-rate-val" style="color:${rCol}">${illPct.toFixed(1)}%</span>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function renderCmpBars(){
-  const el=$('cmpBars'); if(!el) return; el.innerHTML='';
-  const items=CITIES.map(d=>({dist:d,data:D[d.id]})).sort((a,b)=>b.data.newTotal-a.data.newTotal);
+// New constructions stacked bars
+function renderNewBars(){
+  const el=$('ov_newbars');if(!el)return;el.innerHTML='';
+  const items=CITIES.map(c=>({dist:c,data:D[c.id]})).sort((a,b)=>b.data.newTotal-a.data.newTotal);
   const maxN=items[0]?.data.newTotal||1;
   items.forEach(({dist,data})=>{
-    const row=stackedBarRow(
-      dist.label, data.illegal, data.legal, maxN, dist.color,
-      `<b style="color:${dist.color}">${dist.label}</b><br>New: ${fmt(data.newTotal)}<br>Illegal: ${fmt(data.illegal)}<br>Legal: ${fmt(data.legal)}<br>Non-compliance: ${pct(data.illegal,data.newTotal)}`,
-      (val)=>showTab(val),   // whole row → navigate to district tab
-      null, dist.id
-    );
-    row.querySelector('.bar-lbl').style.color=dist.color;
+    const row=mkStacked(dist.label,data.illegal,data.legal,maxN,`<b>${dist.label}</b><br>New 2025: ${fmt(data.newTotal)}<br>Without Permit: ${fmt(data.illegal)}<br>With Permit: ${fmt(data.legal)}<br>Rate: ${pct(data.illegal,data.newTotal)}`);
+    row.addEventListener('click',()=>{hideTip();onDistChange(dist.id);});
     el.appendChild(row);
   });
 }
 
-function renderRiskBars(){
-  const el=$('riskBars'); if(!el) return; el.innerHTML='';
-  const items=CITIES.map(d=>({dist:d,data:D[d.id]})).filter(x=>x.data.newTotal>0)
-    .sort((a,b)=>pctN(b.data.illegal,b.data.newTotal)-pctN(a.data.illegal,a.data.newTotal));
-  if(!items.length){ el.innerHTML='<div style="font-family:var(--mono);font-size:9px;color:var(--ink3);padding:20px 0">Loading…</div>'; return; }
-  const maxR=pctN(items[0].data.illegal,items[0].data.newTotal)||1;
-  items.forEach(({dist,data})=>{
-    const r=pctN(data.illegal,data.newTotal);
-    const col=r>90?'var(--rose)':r>70?'var(--gold)':'var(--lime)';
-    const row=barRow(
-      dist.label, Math.round(r*10)/10, maxR, col,
-      `<b style="color:${dist.color}">${dist.label}</b><br>Non-compliance: ${r.toFixed(1)}%<br>Illegal: ${fmt(data.illegal)} of ${fmt(data.newTotal)}`,
-      '', (val)=>showTab(val), null, dist.id
-    );
-    row.querySelector('.bar-val').textContent=r.toFixed(1)+'%';
-    row.querySelector('.bar-lbl').style.color=dist.color;
+// Zone code stacked bars — aggregated across all cities
+function renderZoneBars(){
+  const el=$('ov_zonebars');if(!el)return;el.innerHTML='';
+  const zoneAgg={};
+  CITIES.forEach(c=>{
+    Object.entries(D[c.id].byZone).forEach(([zc,v])=>{
+      if(!zoneAgg[zc])zoneAgg[zc]={ill:0,leg:0};
+      zoneAgg[zc].ill+=v.illegal;
+      zoneAgg[zc].leg+=v.legal;
+    });
+  });
+  const items=Object.entries(zoneAgg)
+    .map(([zc,v])=>({zc,ill:v.ill,leg:v.leg,tot:v.ill+v.leg}))
+    .filter(r=>r.tot>0)
+    .sort((a,b)=>b.tot-a.tot);
+  const maxZ=items[0]?.tot||1;
+  items.forEach(({zc,ill,leg,tot})=>{
+    const row=mkStacked(zc,ill,leg,maxZ,`<b>${zc}</b><br>Without Permit: ${fmt(ill)}<br>With Permit: ${fmt(leg)}<br>Rate: ${pct(ill,tot)}`);
     el.appendChild(row);
   });
 }
 
-function updateGlobalKpis(){
-  let base=0,newT=0,ill=0;
-  CITIES.forEach(c=>{base+=D[c.id].baseline;newT+=D[c.id].newTotal;ill+=D[c.id].illegal;});
-  $('g_base').textContent=fmt(base); $('g_new').textContent=fmt(newT);
-  $('g_ill').textContent=fmt(ill);
-  $('g_rate').textContent=newT>0?pctN(ill,newT).toFixed(1)+'%':'—';
+// Overview export — preview shows aggregated rows; CSV fetches real records on demand
+function renderOvTable(){
+  const tbody=$('ov_dltbody');if(!tbody)return;
+  // Show placeholder rows from aggregated data so table isn't empty
+  const rows=[];
+  CITIES.forEach(city=>{
+    const topZone=Object.entries(D[city.id].byZone).sort((a,b)=>(b[1].illegal+b[1].legal)-(a[1].illegal+a[1].legal))[0]?.[0]||'—';
+    Object.entries(D[city.id].bySector).forEach(([sec,sv])=>{
+      rows.push({UPI:'—',City:city.label,Sector:sec,Cell:'—',Village:'—','Zone Code':topZone,'With Permit':sv.legal,'Without Permit':sv.illegal});
+    });
+  });
+  window._ovDlRows=null; // real records fetched on demand
+  const total=CITIES.reduce((s,c)=>s+D[c.id].baseline+D[c.id].newTotal,0);
+  $('ov_dlcount').textContent=`~${fmt(total)} records — click CSV to export`;
+  tbody.innerHTML=rows.map(r=>`<tr>
+    <td style="color:var(--ink4)">—</td>
+    <td style="color:var(--ink)">${r.City}</td>
+    <td style="color:var(--ink2)">${r.Sector}</td>
+    <td style="color:var(--ink3)">fetched on export</td>
+    <td style="color:var(--ink3)">fetched on export</td>
+    <td style="color:var(--ink2)">${r['Zone Code']}</td>
+    <td style="text-align:right;color:var(--ink2)">${fmt(r['With Permit'])}</td>
+    <td style="text-align:right;color:var(--ink2)">${fmt(r['Without Permit'])}</td>
+  </tr>`).join('');
 }
 
-// ══════════════════════════════════════════════════════════════
-//  CITY VIEW
-// ══════════════════════════════════════════════════════════════
-function renderCity(city){
-  const d=D[city.id]; if(!d.loaded) return;
-  const {base,ill,leg,newT}=getFilteredTotals(d);
-  const illR=pctN(ill,newT);
-  const rCol=illR>90?'var(--rose)':illR>70?'var(--gold)':'var(--lime)';
-  const secCount=filteredSectors(d).filter(([,v])=>v.baseline>0||v.illegal+v.legal>0).length;
-
-  $(`csub_${city.id}`).textContent=`${city.province.toUpperCase()} · ${secCount} URBANIZED SECTOR${secCount!==1?'S':''} · ${fmt(base)} BASELINE · ${fmt(newT)} NEW 2025`;
-  $(`kBaseline_${city.id}`).textContent=fmt(base);
-  $(`kNew_${city.id}`).textContent=fmt(newT);
-  $(`kIll_${city.id}`).textContent=fmt(ill);
-  $(`kLeg_${city.id}`).textContent=fmt(leg);
-  $(`kRate_${city.id}`).textContent=newT>0?illR.toFixed(1)+'%':'—';
-  $(`kRate_${city.id}`).style.color=rCol;
-
-  renderSectorChange(city,d);
-  renderZoneTable(city,d);
-  renderCellBars(city,d);
-  renderVillageBars(city,d);
-  renderLuBars(city,d);
-  buildDownloadTable(city,d);
-  updateCityMap(city);
+async function fetchAllRecords(city){
+  const fields=['upi',F.SECTOR,F.CELL,F.VILLAGE,F.ZONE,F.LEGAL].join(',');
+  const pageSize=1000;let offset=0;const all=[];
+  while(true){
+    const body=new URLSearchParams();
+    body.set('where','1=1');
+    body.set('outFields',fields);
+    body.set('returnGeometry','false');
+    body.set('resultOffset',offset);
+    body.set('resultRecordCount',pageSize);
+    body.set('f','json');
+    try{
+      const r=await fetch(city.svc+'/query',{method:'POST',body,headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+      const j=await r.json();
+      if(j.error||!j.features?.length)break;
+      j.features.forEach(f=>{
+        const a=f.attributes;
+        all.push({
+          UPI:a.upi||a.UPI||'—',
+          City:city.label,
+          Sector:a[F.SECTOR]||'—',
+          Cell:a[F.CELL]||'—',
+          Village:a[F.VILLAGE]||'—',
+          'Zone Code':a[F.ZONE]||'—',
+          'Permit Status':a[F.LEGAL]||'—'
+        });
+      });
+      if(j.features.length<pageSize)break;
+      offset+=pageSize;
+    }catch(e){console.warn(city.label,e);break;}
+  }
+  return all;
 }
 
-function renderSectorChange(city,d){
-  const el=$(`secChange_${city.id}`); if(!el) return;
-  const secs=filteredSectors(d).filter(([,v])=>v.baseline>0||v.illegal+v.legal>0)
-    .sort((a,b)=>(b[1].illegal+b[1].legal)-(a[1].illegal+a[1].legal));
-  if(!secs.length){ el.innerHTML='<div style="font-family:var(--mono);font-size:9px;color:var(--ink3);">No sectors match filters</div>'; return; }
-
-  const maxAll=Math.max(...secs.map(([,v])=>Math.max(v.baseline,v.illegal+v.legal)))||1;
-  const totalBase=secs.reduce((s,[,v])=>s+v.baseline,0);
-  const totalIll=secs.reduce((s,[,v])=>s+v.illegal,0);
-  const totalLeg=secs.reduce((s,[,v])=>s+v.legal,0);
-
-  el.innerHTML=`
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bd2);border:1px solid var(--bd2);border-radius:3px;overflow:hidden;margin-bottom:20px;">
-      <div style="background:var(--bg2);padding:14px 16px;">
-        <div style="font-family:var(--mono);font-size:8px;letter-spacing:1.8px;color:var(--ink3);text-transform:uppercase;margin-bottom:6px;">Baseline 2023</div>
-        <div style="font-family:var(--serif);font-size:24px;color:var(--sky);">${fmt(totalBase)}</div>
-        <div style="font-family:var(--mono);font-size:8px;color:var(--ink4);margin-top:4px;">Existing buildings</div>
-      </div>
-      <div style="background:var(--bg2);padding:14px 16px;">
-        <div style="font-family:var(--mono);font-size:8px;letter-spacing:1.8px;color:var(--ink3);text-transform:uppercase;margin-bottom:6px;">New 2025</div>
-        <div style="font-family:var(--serif);font-size:24px;color:var(--teal);">${fmt(totalIll+totalLeg)}</div>
-        <div style="font-family:var(--mono);font-size:8px;color:var(--ink4);margin-top:4px;">New constructions</div>
-      </div>
-      <div style="background:var(--bg2);padding:14px 16px;">
-        <div style="font-family:var(--mono);font-size:8px;letter-spacing:1.8px;color:var(--ink3);text-transform:uppercase;margin-bottom:6px;">Without Permit</div>
-        <div style="font-family:var(--serif);font-size:24px;color:var(--rose);">${fmt(totalIll)}</div>
-        <div style="font-family:var(--mono);font-size:8px;color:var(--ink4);margin-top:4px;">${pct(totalIll,totalIll+totalLeg)} of new builds</div>
-      </div>
-      <div style="background:var(--bg2);padding:14px 16px;">
-        <div style="font-family:var(--mono);font-size:8px;letter-spacing:1.8px;color:var(--ink3);text-transform:uppercase;margin-bottom:6px;">With Permit</div>
-        <div style="font-family:var(--serif);font-size:24px;color:var(--lime);">${fmt(totalLeg)}</div>
-        <div style="font-family:var(--mono);font-size:8px;color:var(--ink4);margin-top:4px;">${pct(totalLeg,totalIll+totalLeg)} of new builds</div>
-      </div>
-    </div>
-    ${secs.map(([sec,v])=>{
-      const newT=v.illegal+v.legal, illR=pctN(v.illegal,newT);
-      const rCol=illR>90?'var(--rose)':illR>70?'var(--gold)':'var(--lime)';
-      const bW=pctN(v.baseline,maxAll), iW=pctN(v.illegal,maxAll), lW=pctN(v.legal,maxAll);
-      const isActiveSec = activeFilters.sector===sec;
-      return `<div style="padding:12px 0;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .1s;${isActiveSec?'background:rgba(0,212,184,.06);border-left:3px solid var(--teal);padding-left:12px;':''}"
-        onclick="filterMapBySector('${sec.replace(/'/g,"\\'")}')"
-        title="Click to filter map to ${sec}">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
-          <span style="font-family:var(--serif);font-size:15px;color:${isActiveSec?'var(--teal)':'var(--ink)'};">${sec}</span>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-family:var(--mono);font-size:8px;color:var(--ink4);">▶ filter map</span>
-            <span style="font-family:var(--mono);font-size:9px;font-weight:700;color:${rCol};">${illR.toFixed(1)}% non-compliant</span>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-          <span style="font-family:var(--mono);font-size:8px;color:var(--sky);width:68px;letter-spacing:.8px;flex-shrink:0;">Baseline</span>
-          <div style="flex:1;height:8px;background:var(--bg3);border-radius:2px;overflow:hidden;">
-            <div style="width:${bW}%;height:100%;background:var(--bg5);border-radius:2px;"></div>
-          </div>
-          <span style="font-family:var(--mono);font-size:9px;color:var(--sky);width:70px;text-align:right;flex-shrink:0;">${fmt(v.baseline)}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;" onclick="event.stopPropagation();filterMapByLegal('Illegal')">
-          <span style="font-family:var(--mono);font-size:8px;color:var(--rose);width:68px;letter-spacing:.8px;flex-shrink:0;cursor:pointer;">Illegal ▶</span>
-          <div style="flex:1;height:8px;background:var(--bg3);border-radius:2px;overflow:hidden;cursor:pointer;">
-            <div style="width:${iW}%;height:100%;background:rgba(232,92,120,.65);border-radius:2px;"></div>
-          </div>
-          <span style="font-family:var(--mono);font-size:9px;color:var(--rose);width:70px;text-align:right;flex-shrink:0;">${fmt(v.illegal)}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;" onclick="event.stopPropagation();filterMapByLegal('Legal')">
-          <span style="font-family:var(--mono);font-size:8px;color:var(--lime);width:68px;letter-spacing:.8px;flex-shrink:0;cursor:pointer;">Legal ▶</span>
-          <div style="flex:1;height:8px;background:var(--bg3);border-radius:2px;overflow:hidden;cursor:pointer;">
-            <div style="width:${lW}%;height:100%;background:rgba(98,201,122,.65);border-radius:2px;"></div>
-          </div>
-          <span style="font-family:var(--mono);font-size:9px;color:var(--lime);width:70px;text-align:right;flex-shrink:0;">${fmt(v.legal)}</span>
-        </div>
-      </div>`;
-    }).join('')}`;
+async function downloadOvCSV(){
+  const btn=document.querySelector('[onclick="downloadOvCSV()"]');
+  if(btn){btn.textContent='Fetching…';btn.disabled=true;}
+  setStatus('Fetching full records for all cities…');
+  try{
+    const allRows=[];
+    for(const city of CITIES){
+      setStatus(`Fetching ${city.label}…`);
+      const records=await fetchAllRecords(city);
+      allRows.push(...records);
+    }
+    setStatus(null);
+    if(!allRows.length){alert('No records returned');return;}
+    const cols=['UPI','City','Sector','Cell','Village','Zone Code','Permit Status'];
+    const csv=[cols.join(','),...allRows.map(r=>cols.map(c=>`"${String(r[c]??'').replace(/"/g,'""')}"`).join(','))].join('\n');
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+    a.download=`Rwanda_Secondary_Cities_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    $('ov_dlcount').textContent=`${fmt(allRows.length)} records exported`;
+  }finally{
+    if(btn){btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>CSV';btn.disabled=false;}
+    setStatus(null);
+  }
 }
 
-function renderZoneTable(city,d){
-  const tbody=$(`zoneBody_${city.id}`); if(!tbody) return;
-  const rows=filteredZones(d).map(([zc,v])=>{const newT=v.illegal+v.legal;return{zc,...v,newT,illR:pctN(v.illegal,newT)};})
-    .filter(r=>r.newT>0).sort((a,b)=>b.illegal-a.illegal);
-  $(`zoneMeta_${city.id}`).textContent=`${rows.length} zones with new construction`;
-  const maxIll=rows[0]?.illegal||1;
-  tbody.innerHTML=rows.map(r=>{
-    const rCls=r.illR>80?'var(--rose)':r.illR>50?'var(--gold)':'var(--lime)';
-    const bW=pctN(r.illegal,maxIll);
-    const zLabel=(r.label||'').split('-').slice(1).join('-').trim();
-    return `<tr>
-      <td><span class="zone-code">${r.zc}</span></td>
-      <td style="text-align:left;font-size:8px;color:var(--ink3);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${r.label||''}">${zLabel||r.label||'—'}</td>
-      <td style="color:var(--ink2)">${fmt(r.baseline)}</td>
-      <td style="color:var(--ink2)">${fmt(r.newT)}</td>
-      <td style="color:var(--rose)">${fmt(r.illegal)}</td>
-      <td style="color:var(--lime)">${fmt(r.legal)}</td>
-      <td>
-        <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;">
-          <div style="width:50px;height:6px;background:var(--bg3);border-radius:2px;overflow:hidden;">
-            <div style="width:${bW}%;height:100%;background:rgba(232,92,120,.6);border-radius:2px;"></div>
-          </div>
-          <span style="color:${rCls};font-weight:700;font-family:var(--mono);font-size:9px;">${r.illR.toFixed(1)}%</span>
-        </div>
-      </td>
+// ── Shared category palette for land use (not city colors) ──────────────────
+const CAT_COLS=['#4ab0e8','#e8b84b','#62c97a','#a78bfa','#f59e42','#7faacc'];
+
+// Land use pie
+function renderLuPie(){
+  const svg=$('ov_lupie');const leg=$('ov_lulegend');if(!svg||!leg)return;
+  const luAgg={};
+  CITIES.forEach(c=>{
+    Object.entries(D[c.id].byGenLu).forEach(([lu,v])=>{
+      if(!luAgg[lu])luAgg[lu]={ill:0,leg:0};
+      luAgg[lu].ill+=v.illegal;luAgg[lu].leg+=v.legal;
+    });
+  });
+  const items=Object.entries(luAgg).map(([lu,v])=>({lu,val:v.ill+v.leg})).filter(r=>r.val>0).sort((a,b)=>b.val-a.val).slice(0,6);
+  const total=items.reduce((s,r)=>s+r.val,0);if(!total)return;
+  drawDonutPie(svg,items.map((r,i)=>({val:r.val,color:CAT_COLS[i]})));
+  leg.innerHTML=items.map((r,i)=>`
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="width:7px;height:7px;border-radius:2px;background:${CAT_COLS[i]};flex-shrink:0;display:inline-block;"></span>
+      <span style="color:var(--ink2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.lu||'Other'}</span>
+      <span style="color:var(--ink4);">${pctN(r.val,total).toFixed(0)}%</span>
+    </div>`).join('');
+}
+
+// New Constructions by Zoning type — aggregated across all cities
+function renderZoningPie(){
+  const svg=$('ov_citypie');const leg=$('ov_citypielegend');if(!svg||!leg)return;
+  const zoningAgg={};
+  CITIES.forEach(c=>{
+    Object.entries(D[c.id].byZone).forEach(([zc,v])=>{
+      const label=v.label||zc;
+      if(!zoningAgg[label])zoningAgg[label]={val:0};
+      zoningAgg[label].val+=v.illegal+v.legal;
+    });
+  });
+  const items=Object.entries(zoningAgg).map(([label,v])=>({label,val:v.val})).filter(r=>r.val>0).sort((a,b)=>b.val-a.val).slice(0,6);
+  const total=items.reduce((s,r)=>s+r.val,0);if(!total)return;
+  drawDonutPie(svg,items.map((r,i)=>({val:r.val,color:CAT_COLS[i]})));
+  leg.innerHTML=items.map((r,i)=>`
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span style="width:7px;height:7px;border-radius:2px;background:${CAT_COLS[i]};flex-shrink:0;display:inline-block;"></span>
+      <span style="color:var(--ink2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.label||'Unknown'}</span>
+      <span style="color:var(--ink4);">${pctN(r.val,total).toFixed(0)}%</span>
+    </div>`).join('');
+}
+
+// Shared donut pie renderer
+function drawDonutPie(svg,slices){
+  const cx=60,cy=60,R=50,r=28;
+  const total=slices.reduce((s,sl)=>s+sl.val,0);if(!total)return;
+  let angle=-Math.PI/2,paths='';
+  slices.forEach(sl=>{
+    const sweep=sl.val/total*Math.PI*2;
+    const x1=cx+R*Math.cos(angle),y1=cy+R*Math.sin(angle);
+    const x2=cx+R*Math.cos(angle+sweep),y2=cy+R*Math.sin(angle+sweep);
+    const lf=sweep>Math.PI?1:0;
+    paths+=`<path d="M${cx},${cy} L${x1},${y1} A${R},${R} 0 ${lf},1 ${x2},${y2} Z" fill="${sl.color}" opacity=".85"/>`;
+    angle+=sweep;
+  });
+  svg.innerHTML=paths+`<circle cx="${cx}" cy="${cy}" r="${r}" fill="var(--bg1)"/>`;
+}
+
+// Top sectors table across all cities
+function renderTopTable(){
+  const tbody=$('ov_toptbl');if(!tbody)return;
+  const rows=[];
+  CITIES.forEach(city=>{
+    const d=D[city.id];
+    Object.entries(d.bySector).forEach(([sec,v])=>{
+      const nT=v.illegal+v.legal;
+      if(nT>0)rows.push({city,sec,base:v.baseline,nT,ill:v.illegal,leg:v.legal,rate:pctN(v.illegal,nT)});
+    });
+  });
+  rows.sort((a,b)=>b.ill-a.ill);
+  tbody.innerHTML=rows.slice(0,15).map((r,i)=>{
+    return`<tr>
+      <td class="rank">${i+1}</td>
+      <td>${r.city.label}</td>
+      <td style="color:var(--ink)">${r.sec}</td>
+      <td style="text-align:right;color:var(--ink2)">${fmt(r.base+r.nT)}</td>
+      <td style="text-align:right;color:var(--ink2)">${fmt(r.nT)}</td>
+      <td style="text-align:right;color:var(--ink2)">${fmt(r.ill)}</td>
+      <td style="text-align:right;color:var(--ink2)">${r.rate.toFixed(1)}%</td>
     </tr>`;
   }).join('');
 }
 
-function renderCellBars(city,d){
-  const el=$(`cellBars_${city.id}`); if(!el) return; el.innerHTML='';
-  const items=filteredCells(d).map(([cel,v])=>({cel,...v,newT:v.illegal+v.legal}))
-    .filter(r=>r.newT>0||r.baseline>0).sort((a,b)=>b.newT-a.newT);
-  const maxN=Math.max(...items.map(r=>r.illegal),1);
-  $(`cellMeta_${city.id}`).textContent=`${items.length} cells · click to filter map`;
-  items.forEach(({cel,baseline,illegal,legal,newT})=>{
-    const row=stackedBarRow(
-      cel, illegal, legal, Math.max(maxN,1), 'var(--sky)',
-      `<b>${cel}</b><br>Baseline: ${fmt(baseline)}<br>New 2025: ${fmt(newT)}<br>Illegal: ${fmt(illegal)}<br>Legal: ${fmt(legal)}<br>Non-compliance: ${pct(illegal,newT)}`,
-      filterMapByCell, 'cell', cel
-    );
-    el.appendChild(row);
-  });
+function updateGlobalKpis(){
+  let totalB=0,newT=0,noPermit=0,withPermit=0;
+  CITIES.forEach(c=>{totalB+=D[c.id].baseline;newT+=D[c.id].newTotal;noPermit+=D[c.id].illegal;withPermit+=D[c.id].legal;});
+  $('g_base').textContent=fmt(totalB+newT);
+  $('g_new').textContent=fmt(newT);
+  $('g_leg').textContent=fmt(withPermit);
+  $('g_ill').textContent=fmt(noPermit);
+  $('g_rate').textContent=newT>0?pctN(noPermit,newT).toFixed(1)+'%':'—';
 }
 
-function renderVillageBars(city,d){
-  const el=$(`vilBars_${city.id}`); if(!el) return; el.innerHTML='';
-  const items=Object.entries(d.byVillage).map(([vil,v])=>({vil,...v,total:v.illegal+v.legal}))
-    .filter(r=>r.illegal>0).sort((a,b)=>b.illegal-a.illegal);
-  const maxI=items[0]?.illegal||1;
-  $(`vilMeta_${city.id}`).textContent=`${items.length} villages · click to filter map`;
-  items.slice(0,30).forEach(({vil,illegal,legal,total})=>{
-    const row=barRow(
-      vil, illegal, maxI, 'var(--rose)',
-      `<b>${vil}</b><br>Illegal: ${fmt(illegal)}<br>Legal: ${fmt(legal)}<br>Non-compliance: ${pct(illegal,total)}`,
-      `<span class="bar-pct">${pct(illegal,total)}</span>`,
-      filterMapByVillage, 'village', vil
-    );
-    el.appendChild(row);
-  });
-}
+// ══════════════════════════════════════════════════════
+//  CITY FILTER STATE
+// ══════════════════════════════════════════════════════
+const cityFilter={};  // cityId → {type:'sector'|'cell'|'village', value:string} | null
+CITIES.forEach(c=>{cityFilter[c.id]=null;});
 
-function renderLuBars(city,d){
-  const el=$(`luBars_${city.id}`); if(!el) return; el.innerHTML='';
-  const items=Object.entries(d.byGenLu).map(([lu,v])=>({lu,...v,total:v.illegal+v.legal}))
-    .filter(r=>r.total>0).sort((a,b)=>b.illegal-a.illegal);
-  const maxN=Math.max(...items.map(r=>r.illegal),1);
-  items.forEach(({lu,illegal,legal,total})=>{
-    const row=stackedBarRow(
-      lu, illegal, legal, maxN, 'var(--teal)',
-      `<b>${lu}</b><br>Illegal: ${fmt(illegal)}<br>Legal: ${fmt(legal)}<br>Non-compliance: ${pct(illegal,total)}`,
-      null, null, null   // land-use has no direct filter field; only segment clicks (Illegal/Legal) work
-    );
-    el.appendChild(row);
-  });
-}
-
-// ══════════════════════════════════════════════════════════════
-//  CSV DOWNLOAD
-// ══════════════════════════════════════════════════════════════
-function buildDownloadTable(city,d){
-  const tbody=$(`dlBody_${city.id}`); if(!tbody) return;
-  const rows=[];
-  Object.entries(d.bySector).forEach(([sec,sv])=>{
-    if(activeFilters.sector&&sec!==activeFilters.sector) return;
-    const newT=sv.illegal+sv.legal;
-    rows.push({District:city.label,Province:city.province,Sector:sec,Cell:'(all)',Village:'(all)','Zone Code':'(all)','Zone Type':'(all)','Baseline 2023':sv.baseline,'New 2025':newT,'Without Permit (Illegal)':sv.illegal,'With Permit (Legal)':sv.legal,'Non-Compliance %':newT>0?(sv.illegal/newT*100).toFixed(1)+'%':'—'});
-  });
-  filteredZones(d).forEach(([zc,zv])=>{
-    const newT=zv.illegal+zv.legal;
-    if(newT===0&&zv.baseline===0) return;
-    if(activeFilters.sector||activeFilters.cell||activeFilters.village) return;
-    rows.push({District:city.label,Province:city.province,Sector:'(all)',Cell:'(all)',Village:'(all)','Zone Code':zc,'Zone Type':(zv.label||'').split('-').slice(1).join('-').trim()||zv.label||'','Baseline 2023':zv.baseline,'New 2025':newT,'Without Permit (Illegal)':zv.illegal,'With Permit (Legal)':zv.legal,'Non-Compliance %':newT>0?(zv.illegal/newT*100).toFixed(1)+'%':'—'});
-  });
-  d.dlRows=rows;
-  $(`dlCount_${city.id}`).textContent=`${rows.length} rows`;
-  tbody.innerHTML=rows.map(r=>`<tr>
-    <td style="color:var(--ink);font-weight:600">${r.District}</td>
-    <td style="color:var(--ink3)">${r.Sector}</td>
-    <td style="color:var(--ink3)">${r.Cell}</td>
-    <td style="color:var(--ink3)">${r.Village}</td>
-    <td><span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--teal)">${r['Zone Code']}</span></td>
-    <td style="color:var(--ink3);max-width:120px;overflow:hidden;text-overflow:ellipsis;font-size:10px">${r['Zone Type']}</td>
-    <td style="text-align:right;color:var(--ink2)">${fmt(r['Baseline 2023'])}</td>
-    <td style="text-align:right;color:var(--teal)">${fmt(r['New 2025'])}</td>
-    <td style="text-align:right;color:var(--rose);font-weight:700">${fmt(r['Without Permit (Illegal)'])}</td>
-    <td style="text-align:right;color:var(--lime)">${fmt(r['With Permit (Legal)'])}</td>
-    <td style="text-align:right;font-weight:700;color:var(--ink)">${r['Non-Compliance %']}</td>
-  </tr>`).join('');
-}
-
-function downloadCSV(cityId){
-  const d=D[cityId]; if(!d||!d.dlRows||!d.dlRows.length){alert('No data yet');return;}
-  const cols=Object.keys(d.dlRows[0]);
-  const csv=[cols.join(','),...d.dlRows.map(r=>cols.map(c=>`"${String(r[c]).replace(/"/g,'""')}"`).join(','))].join('\n');
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+function setFilter(cityId, type, value){
+  const cur=cityFilter[cityId];
+  // Toggle off if same
+  if(cur && cur.type===type && cur.value===value){
+    cityFilter[cityId]=null;
+  } else {
+    cityFilter[cityId]={type,value};
+  }
   const city=CITIES.find(c=>c.id===cityId);
-  a.download=`${city?.label||cityId}_change_detection_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  refreshDistView(city);
+  syncMapFilter(cityId);
 }
 
-// ══════════════════════════════════════════════════════════════
-//  ARCGIS MAPS
-// ══════════════════════════════════════════════════════════════
-let arcReady=false;
-const mapViews={}, mapLayers={};
-
-function loadArcGIS(cb){
-  if(arcReady){cb();return;}
-  const lnk=document.createElement('link');lnk.rel='stylesheet';lnk.href='https://js.arcgis.com/4.29/esri/themes/dark/main.css';document.head.appendChild(lnk);
-  const s=document.createElement('script');s.src='https://js.arcgis.com/4.29/';
-  s.onload=()=>setTimeout(()=>{arcReady=true;cb();},200);document.head.appendChild(s);
+function clearCityFilter(cityId){
+  cityFilter[cityId]=null;
+  const city=CITIES.find(c=>c.id===cityId);
+  refreshDistView(city);
+  syncMapFilter(cityId);
 }
 
-const permitRenderer={
-  type:'unique-value',field:'legal_t',
-  defaultSymbol:{type:'simple-fill',color:[26,53,80,140],outline:{color:[255,255,255,15],width:.2}},
-  uniqueValueInfos:[
-    {value:'Legal',   symbol:{type:'simple-fill',color:'#00d4b8bb',outline:{color:'#00d4b8',width:.7}}},
-    {value:'Illegal', symbol:{type:'simple-fill',color:'#e85c78bb',outline:{color:'#e85c78',width:.7}}},
-    {value:'Existing',symbol:{type:'simple-fill',color:'#1c355088',outline:{color:'#243f5e',width:.3}}},
-  ]
-};
+// Returns filtered subset of D[cityId] based on active filter
+function getFilteredData(cityId){
+  const d=D[cityId];
+  const f=cityFilter[cityId];
+  if(!f) return d;
 
-const popupTpl={title:'{legal_t} — {status_t}',content:'<b>Zone:</b> {zone_code} — {zoning}<br><b>Land Use:</b> {gen_lu}<br><b>Sector:</b> {sector}<br><b>Cell:</b> {cell}<br><b>Village:</b> {village}<br><b>Year:</b> {year_t}'};
+  // We need to compute filtered counts from raw grouped data
+  // Filter by sector: use bySector entry, recompute cells/villages from raw (we don't have cross-joins)
+  // Best we can do: filter bySector/byCell/byVillage by name match
+  const out={
+    baseline:0,newTotal:0,illegal:0,legal:0,
+    bySector:{},byCell:{},byVillage:{},byZone:d.byZone,byGenLu:{}
+  };
 
-// ── Build the definitionExpression string from active filters
-function buildMapExpr(){
-  const esc=v=>String(v).replace(/'/g,"''");
-  const parts=[];
-  if(activeFilters.sector)  parts.push(`${F.SECTOR}='${esc(activeFilters.sector)}'`);
-  if(activeFilters.cell)    parts.push(`${F.CELL}='${esc(activeFilters.cell)}'`);
-  if(activeFilters.village) parts.push(`${F.VILLAGE}='${esc(activeFilters.village)}'`);
-  if(activeFilters.zone)    parts.push(`${F.ZONE}='${esc(activeFilters.zone)}'`);
-  if(activeFilters.legal)   parts.push(`${F.LEGAL}='${activeFilters.legal}'`);
-  if(activeFilters.year)    parts.push(`${F.YEAR}='${activeFilters.year}'`);
-  return parts.length ? parts.join(' AND ') : '1=1';
-}
-
-// ── Zoom map to filtered extent
-function zoomMapToFilter(id){
-  const view=mapViews[id]; const layer=mapLayers[id];
-  if(!layer||!view||view==='loading') return;
-  const expr=layer.definitionExpression;
-  if(!expr||expr==='1=1') return;
-  layer.queryExtent({where:expr,outSpatialReference:{wkid:102100}})
-    .then(r=>{ if(r&&r.extent) view.goTo(r.extent.expand(1.4),{duration:800,easing:'ease-in-out'}).catch(()=>{}); })
-    .catch(()=>{});
-}
-
-// ── Apply current filters to a specific map layer + zoom
-function applyMapFilter(id, doZoom=false){
-  if(!mapLayers[id]) return;
-  const expr=buildMapExpr();
-  mapLayers[id].definitionExpression=expr;
-  // Update hint bar
-  const hint=$(`mhint_${id}`);
-  if(hint){
-    const city=CITIES.find(c=>c.id===id);
-    const filterDesc = expr==='1=1'
-      ? `${city?.label||id} · click a building for details`
-      : `Filtered: ${expr.replace(/AND/g,'·')}`;
-    hint.textContent=filterDesc;
+  if(f.type==='sector'){
+    const sv=d.bySector[f.value];
+    if(!sv) return d;
+    out.bySector={[f.value]:sv};
+    out.baseline=sv.baseline;
+    out.illegal=sv.illegal;
+    out.legal=sv.legal;
+    out.newTotal=sv.illegal+sv.legal;
+    // cells/villages: keep all (no cross-join available) but scale proportionally
+    out.byCell=d.byCell;
+    out.byVillage=d.byVillage;
+    out.byGenLu=d.byGenLu;
+  } else if(f.type==='cell'){
+    const cv=d.byCell[f.value];
+    if(!cv) return d;
+    out.byCell={[f.value]:cv};
+    out.baseline=cv.baseline;
+    out.illegal=cv.illegal;
+    out.legal=cv.legal;
+    out.newTotal=cv.illegal+cv.legal;
+    out.bySector=d.bySector;
+    out.byVillage=d.byVillage;
+    out.byGenLu=d.byGenLu;
+  } else if(f.type==='village'){
+    const vv=d.byVillage[f.value];
+    if(!vv) return d;
+    out.byVillage={[f.value]:vv};
+    out.baseline=0;
+    out.illegal=vv.illegal;
+    out.legal=vv.legal;
+    out.newTotal=vv.illegal+vv.legal;
+    out.bySector=d.bySector;
+    out.byCell=d.byCell;
+    out.byGenLu=d.byGenLu;
   }
-  if(doZoom || activeFilters.sector || activeFilters.cell || activeFilters.village || activeFilters.zone || activeFilters.legal){
-    zoomMapToFilter(id);
+  return out;
+}
+
+// ══════════════════════════════════════════════════════
+//  DISTRICT VIEW — RENDER + REFRESH
+// ══════════════════════════════════════════════════════
+function fillDistView(city){ refreshDistView(city); }
+
+function refreshDistView(city){
+  const d=D[city.id];if(!d.loaded)return;
+  const f=cityFilter[city.id];
+  const fd=getFilteredData(city.id);
+
+  const ill=fd.illegal,leg=fd.legal,newT=fd.newTotal,base=fd.baseline;
+  const illR=newT>0?pctN(ill,newT):0;
+  const rCol=illR>90?'var(--rose)':illR>70?'var(--gold)':'var(--lime)';
+
+  // KPIs
+  const kpis=[[$(`dv_base_${city.id}`),'var(--sky)',fmt(base+newT)],[$(`dv_new_${city.id}`),'var(--teal)',fmt(newT)],[$(`dv_ill_${city.id}`),'var(--rose)',fmt(ill)],[$(`dv_leg_${city.id}`),'var(--lime)',fmt(leg)],[$(`dv_rate_${city.id}`),rCol,illR.toFixed(1)+'%']];
+  kpis.forEach(([el,col,val])=>{if(el){el.textContent=val;el.style.color=col;}});
+
+  // Filter pill
+  const pill=$(`dv_pill_${city.id}`);
+  const pillLbl=$(`dv_pill_lbl_${city.id}`);
+  if(pill && pillLbl){
+    if(f){pill.classList.add('show');pillLbl.textContent=`${f.type}: ${f.value}`;}
+    else{pill.classList.remove('show');}
+  }
+
+  // Sectors
+  const secEl=$(`dv_sec_${city.id}`);if(secEl){
+    secEl.innerHTML='';
+    const secs=Object.entries(d.bySector).sort((a,b)=>(b[1].illegal+b[1].legal)-(a[1].illegal+a[1].legal));
+    const maxS=Math.max(...secs.map(([,v])=>v.illegal+v.legal),1);
+    secs.forEach(([sec,v])=>{
+      const nT=v.illegal+v.legal;
+      const row=mkStacked(sec,v.illegal,v.legal,maxS,`<b>${sec}</b><br>Total: ${fmt(v.baseline+nT)}<br>New 2025: ${fmt(nT)}<br>Without Permit: ${fmt(v.illegal)} (${pctN(v.illegal,nT).toFixed(1)}%)`);
+      if(f && f.type==='sector'){
+        if(f.value===sec) row.classList.add('active'); else row.classList.add('dimmed');
+      }
+      row.addEventListener('click',()=>{ hideTip(); setFilter(city.id,'sector',sec); });
+      secEl.appendChild(row);
+    });
+  }
+
+  // LU — filtered by active filter's illegal/legal totals
+  const luEl=$(`dv_lu_${city.id}`);if(luEl){
+    luEl.innerHTML='';
+    const items=Object.entries(d.byGenLu).map(([lu,v])=>({lu,...v,tot:v.illegal+v.legal})).filter(r=>r.tot>0).sort((a,b)=>b.illegal-a.illegal);
+    const maxL=Math.max(...items.map(r=>r.illegal),1);
+    items.forEach(({lu,illegal,legal,tot})=>{luEl.appendChild(mkStacked(lu,illegal,legal,maxL,`<b>${lu}</b><br>Without Permit: ${fmt(illegal)}<br>Rate: ${pct(illegal,tot)}`));});
+  }
+
+  // Cells
+  const celEl=$(`dv_cel_${city.id}`);if(celEl){
+    celEl.innerHTML='';
+    const items=Object.entries(d.byCell).map(([c,v])=>({c,...v,nT:v.illegal+v.legal})).filter(r=>r.nT>0).sort((a,b)=>b.nT-a.nT);
+    const maxC=Math.max(...items.map(r=>r.illegal),1);
+    $(`dv_celmeta_${city.id}`).textContent=`${items.length} cells`;
+    items.forEach(({c,baseline,illegal,legal,nT})=>{
+      const row=mkStacked(c,illegal,legal,Math.max(maxC,1),`<b>${c}</b><br>Total: ${fmt(baseline+nT)}<br>New 2025: ${fmt(nT)}<br>Without Permit: ${fmt(illegal)}<br>Rate: ${pct(illegal,nT)}`);
+      if(f && f.type==='cell'){
+        if(f.value===c) row.classList.add('active'); else row.classList.add('dimmed');
+      }
+      row.addEventListener('click',()=>{ hideTip(); setFilter(city.id,'cell',c); });
+      celEl.appendChild(row);
+    });
+  }
+
+  // Villages
+  const vilEl=$(`dv_vil_${city.id}`);if(vilEl){
+    vilEl.innerHTML='';
+    const items=Object.entries(d.byVillage).map(([v,x])=>({v,...x,tot:x.illegal+x.legal})).filter(r=>r.illegal>0).sort((a,b)=>b.illegal-a.illegal);
+    const maxV=items[0]?.illegal||1;
+    $(`dv_vilmeta_${city.id}`).textContent=`${items.length} villages`;
+    items.slice(0,20).forEach(({v,illegal,legal,tot})=>{
+      const row=mkBar(v,illegal,maxV,'var(--rose)',`<b>${v}</b><br>Without Permit: ${fmt(illegal)}<br>Rate: ${pct(illegal,tot)}`);
+      if(f && f.type==='village'){
+        if(f.value===v) row.classList.add('active'); else row.classList.add('dimmed');
+      }
+      row.addEventListener('click',()=>{ hideTip(); setFilter(city.id,'village',v); });
+      vilEl.appendChild(row);
+    });
+  }
+
+  // DL preview
+  const dlBody=$(`dv_dl_${city.id}`);if(dlBody){
+    const previewRows=Object.entries(d.bySector).map(([sec,sv])=>{
+      const nT=sv.illegal+sv.legal;
+      return{City:city.label,Sector:sec,Cell:'fetched on export',Village:'fetched on export',UPI:'fetched on export',
+        'Total Buildings':fmt(sv.baseline+nT),'New 2025':fmt(nT),
+        'Without Permit':fmt(sv.illegal),'With Permit':fmt(sv.legal)};
+    });
+    const total=d.baseline+d.newTotal;
+    $(`dv_dlcount_${city.id}`).textContent=`~${fmt(total)} records — click CSV to export`;
+    dlBody.innerHTML=previewRows.map(r=>`<tr>
+      <td style="color:var(--ink)">${r.City}</td>
+      <td style="color:var(--ink2)">${r.Sector}</td>
+      <td style="color:var(--ink3)">${r.Cell}</td>
+      <td style="color:var(--ink3)">${r.Village}</td>
+      <td style="color:var(--ink4)">${r.UPI}</td>
+      <td style="text-align:right;color:var(--ink2)">${r['Total Buildings']}</td>
+      <td style="text-align:right;color:var(--ink2)">${r['New 2025']}</td>
+      <td style="text-align:right;color:var(--ink2)">${r['Without Permit']}</td>
+      <td style="text-align:right;color:var(--ink2)">${r['With Permit']}</td>
+    </tr>`).join('');
   }
 }
 
-function updateMapFilter(){
-  CITIES.forEach(c=>{ if(mapLayers[c.id]) applyMapFilter(c.id, true); });
-}
-function updateCityMap(city){ if(mapLayers[city.id]) applyMapFilter(city.id, false); }
+// ══════════════════════════════════════════════════════
+//  MAP FILTER + ZOOM
+// ══════════════════════════════════════════════════════
+function syncMapFilter(cityId){
+  const view=mapViews[cityId];
+  if(!view || typeof view==='string') return; // map not ready yet
+  const f=cityFilter[cityId];
+  const layer=view.map.allLayers.find(l=>l.type==='feature');
+  if(!layer) return;
 
-// ── Filter map directly from bar chart click — no dropdown needed
-function filterMapByLegal(legalVal){
-  // Toggle: clicking same value clears it
-  if(activeFilters.legal===legalVal) legalVal='';
-  activeFilters.legal=legalVal;
-  const sel=$('f_legal'); if(sel) sel.value=legalVal;
-  const active=Object.values(activeFilters).filter(Boolean).length;
-  $('filterCount').textContent=active?`${active} active`:'';
-  // Re-render charts to reflect selection
-  if(currentCity&&currentCity!=='all'){ const city=CITIES.find(c=>c.id===currentCity); if(city) renderCity(city); }
-  else renderAllView();
-  updateMapFilter();
-}
+  if(!f){
+    // Clear filter — restore full extent
+    layer.definitionExpression='';
+    const hint=$(`dv_maphint_${cityId}`);
+    const city=CITIES.find(c=>c.id===cityId);
+    if(hint) hint.textContent=`${city.label} · click a building for details`;
+    view.goTo(view.map.initialViewProperties?.viewpoint||{zoom:13}).catch(()=>{});
+    return;
+  }
 
-function filterMapBySector(sectorVal){
-  if(activeFilters.sector===sectorVal) sectorVal='';
-  activeFilters.sector=sectorVal;
-  const sel=$('f_sector'); if(sel) sel.value=sectorVal;
-  const active=Object.values(activeFilters).filter(Boolean).length;
-  $('filterCount').textContent=active?`${active} active`:'';
-  if(currentCity&&currentCity!=='all'){ const city=CITIES.find(c=>c.id===currentCity); if(city) renderCity(city); }
-  else renderAllView();
-  updateMapFilter();
-}
+  // Build where clause
+  const fieldMap={sector:F.SECTOR, cell:F.CELL, village:F.VILLAGE};
+  const field=fieldMap[f.type];
+  const where=`${field} = '${f.value.replace(/'/g,"''")}'`;
 
-function filterMapByCell(cellVal){
-  if(activeFilters.cell===cellVal) cellVal='';
-  activeFilters.cell=cellVal;
-  const sel=$('f_cell'); if(sel) sel.value=cellVal;
-  const active=Object.values(activeFilters).filter(Boolean).length;
-  $('filterCount').textContent=active?`${active} active`:'';
-  if(currentCity&&currentCity!=='all'){ const city=CITIES.find(c=>c.id===currentCity); if(city) renderCity(city); }
-  else renderAllView();
-  updateMapFilter();
+  layer.definitionExpression=where;
+
+  const hint=$(`dv_maphint_${cityId}`);
+  if(hint) hint.textContent=`Filtered: ${f.type} = ${f.value}`;
+
+  // Query extent of filtered features then zoom
+  layer.queryExtent({where}).then(result=>{
+    if(result.count>0 && result.extent){
+      view.goTo(result.extent.expand(1.4)).catch(()=>{});
+    }
+  }).catch(()=>{});
 }
 
-function filterMapByVillage(villageVal){
-  if(activeFilters.village===villageVal) villageVal='';
-  activeFilters.village=villageVal;
-  const sel=$('f_village'); if(sel) sel.value=villageVal;
-  const active=Object.values(activeFilters).filter(Boolean).length;
-  $('filterCount').textContent=active?`${active} active`:'';
-  if(currentCity&&currentCity!=='all'){ const city=CITIES.find(c=>c.id===currentCity); if(city) renderCity(city); }
-  else renderAllView();
-  updateMapFilter();
+async function downloadCSV(cityId){
+  const city=CITIES.find(c=>c.id===cityId);if(!city)return;
+  const btn=document.querySelector(`[onclick="downloadCSV('${cityId}')"]`);
+  if(btn){btn.textContent='Fetching…';btn.disabled=true;}
+  setStatus(`Fetching ${city.label} records…`);
+  try{
+    const records=await fetchAllRecords(city);
+    setStatus(null);
+    if(!records.length){alert('No records returned');return;}
+    const cols=['UPI','City','Sector','Cell','Village','Zone Code','Permit Status'];
+    const csv=[cols.join(','),...records.map(r=>cols.map(c=>`"${String(r[c]??'').replace(/"/g,'""')}"`).join(','))].join('\n');
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+    a.download=`${city.label}_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    $(`dv_dlcount_${cityId}`).textContent=`${fmt(records.length)} records exported`;
+  }finally{
+    if(btn){btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>CSV';btn.disabled=false;}
+    setStatus(null);
+  }
 }
 
-function filterMapByZone(zoneVal){
-  if(activeFilters.zone===zoneVal) zoneVal='';
-  activeFilters.zone=zoneVal;
-  const sel=$('f_zone'); if(sel) sel.value=zoneVal;
-  const active=Object.values(activeFilters).filter(Boolean).length;
-  $('filterCount').textContent=active?`${active} active`:'';
-  if(currentCity&&currentCity!=='all'){ const city=CITIES.find(c=>c.id===currentCity); if(city) renderCity(city); }
-  else renderAllView();
-  updateMapFilter();
-}
-
-// ── Active filter highlight style for bar rows
-function isActive(field, val){
-  const map={legal:activeFilters.legal,sector:activeFilters.sector,cell:activeFilters.cell,village:activeFilters.village,zone:activeFilters.zone};
-  return map[field]===val && val!=='';
-}
+// ══════════════════════════════════════════════════════
+//  MAP
+// ══════════════════════════════════════════════════════
+let arcReady=false;const mapViews={};
+function loadArcGIS(cb){if(arcReady){cb();return;}const lnk=document.createElement('link');lnk.rel='stylesheet';lnk.href='https://js.arcgis.com/4.29/esri/themes/dark/main.css';document.head.appendChild(lnk);const s=document.createElement('script');s.src='https://js.arcgis.com/4.29/';s.onload=()=>setTimeout(()=>{arcReady=true;cb();},200);document.head.appendChild(s);}
+const permitRenderer={type:'unique-value',field:'legal_t',defaultSymbol:{type:'simple-fill',color:[26,53,80,140],outline:{color:[255,255,255,15],width:.2}},uniqueValueInfos:[{value:'Legal',symbol:{type:'simple-fill',color:'#00d4b8bb',outline:{color:'#00d4b8',width:.7}}},{value:'Illegal',symbol:{type:'simple-fill',color:'#e85c78bb',outline:{color:'#e85c78',width:.7}}},{value:'Existing',symbol:{type:'simple-fill',color:'#1c355088',outline:{color:'#243f5e',width:.3}}}]};
+const popupTpl={title:'Permit Status: {legal_t}',content:'<b>Land Use:</b> {gen_lu}<br><b>Sector:</b> {sector}<br><b>Cell:</b> {cell}<br><b>Village:</b> {village}<br><b>UPI:</b> {upi}'};
 
 function initCityMap(id){
-  if(mapViews[id]) return; mapViews[id]='loading';
-  const city=CITIES.find(c=>c.id===id); if(!city) return;
-  const wmId=WEBMAP_IDS[id];
-  if(!wmId){ console.warn('No WebMap ID for',id); return; }
-
+  if(mapViews[id])return;mapViews[id]='loading';
+  const city=CITIES.find(c=>c.id===id);if(!city)return;
   loadArcGIS(()=>{
-    require([
-      'esri/WebMap','esri/views/MapView','esri/layers/FeatureLayer',
-      'esri/widgets/Home','esri/widgets/Search','esri/widgets/Legend',
-      'esri/widgets/Expand','esri/widgets/ScaleBar'
-    ],
+    require(['esri/WebMap','esri/views/MapView','esri/layers/FeatureLayer','esri/widgets/Home','esri/widgets/Search','esri/widgets/Legend','esri/widgets/Expand','esri/widgets/ScaleBar'],
     function(WebMap,MapView,FeatureLayer,Home,Search,Legend,Expand,ScaleBar){
-      const layer=new FeatureLayer({
-        url:city.svc,
-        renderer:permitRenderer,
-        popupTemplate:popupTpl,
-        title:`${city.label} — Construction Status`,
-        outFields:['*']
-      });
-      mapLayers[id]=layer;
-
-      const wm=new WebMap({portalItem:{id:wmId}});
-      wm.add(layer);
-
-      const view=new MapView({
-        container:`mapDiv_${id}`,
-        map:wm,
-        zoom:13,
-        ui:{components:['zoom','attribution']},
-        popup:{dockEnabled:true,dockOptions:{position:'bottom-right',breakpoint:false}}
-      });
-
-      view.ui.add(new Home({view}),'top-left');
-      view.ui.add(new Search({view}),'top-right');
+      const layer=new FeatureLayer({url:city.svc,renderer:permitRenderer,popupTemplate:popupTpl,outFields:['*']});
+      const wm=new WebMap({portalItem:{id:WEBMAP_IDS[id]}});wm.add(layer);
+      const view=new MapView({container:`dv_map_${id}`,map:wm,zoom:13,ui:{components:['zoom','attribution']},popup:{dockEnabled:true,dockOptions:{position:'bottom-right',breakpoint:false}}});
+      view.ui.add(new Home({view}),'top-left');view.ui.add(new Search({view}),'top-right');
       view.ui.add(new ScaleBar({view,unit:'metric'}),'bottom-right');
-      view.ui.add(new Expand({
-        view,
-        content:new Legend({view,layerInfos:[{layer,title:'Permit Status'}]}),
-        expandIcon:'legend',expanded:false
-      }),'bottom-left');
-
+      view.ui.add(new Expand({view,content:new Legend({view,layerInfos:[{layer,title:'Permit Status'}]}),expandIcon:'legend',expanded:false}),'bottom-left');
       view.when(()=>{
         mapViews[id]=view;
-        applyMapFilter(id, false);
-
-        // ── Click on map feature → update filters + re-render charts
-        view.on('click', async evt=>{
-          try{
-            const res=await view.hitTest(evt,{include:[layer]});
-            const hit=res.results[0];
-            if(!hit||!hit.graphic) return;
-            const a=hit.graphic.attributes;
-
-            // If clicking on a sector highlight it in filters
-            if(a[F.SECTOR] && a[F.SECTOR]!==activeFilters.sector){
-              activeFilters.sector=a[F.SECTOR];
-              const sel=$('f_sector'); if(sel) sel.value=a[F.SECTOR];
-              const active=Object.values(activeFilters).filter(Boolean).length;
-              $('filterCount').textContent=active?`${active} active`:'';
-              const c=CITIES.find(c=>c.id===id); if(c) renderCity(c);
-              applyMapFilter(id, false); // don't re-zoom on feature click
-            }
-          }catch(e){}
-        });
+        const h=$(`dv_maphint_${id}`);
+        if(h) h.textContent=`${city.label} · click a building for details`;
+        // Apply any filter that was set before map was ready
+        if(cityFilter[id]) syncMapFilter(id);
       });
     });
   });
 }
 
-// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 //  BUILD DOM
-// ══════════════════════════════════════════════════════════════
-function buildTabs(){
-  const bar=$('tabBar');
+// ══════════════════════════════════════════════════════
+function buildDropdown(){
+  const sel=$('distSelect');
   CITIES.forEach(c=>{
-    const btn=document.createElement('button');
-    btn.className='tab'; btn.id=`tab_${c.id}`; btn.onclick=()=>showTab(c.id);
-    btn.innerHTML=`<span class="tab-dot" style="background:${c.color}"></span>${c.label}<span class="tbadge" id="badge_${c.id}">—</span>`;
-    bar.appendChild(btn);
+    const opt=document.createElement('option');
+    opt.value=c.id;opt.textContent=`${c.label} — ${c.province} Province`;
+    sel.appendChild(opt);
   });
 }
 
-function buildCityViews(){
-  const container=$('cityViews');
+function buildDistViews(){
+  const container=$('distViews');
   CITIES.forEach(c=>{
     const div=document.createElement('div');
-    div.className='city-view'; div.id=`view_${c.id}`;
+    div.className='view';div.id=`view_${c.id}`;
     div.innerHTML=`
-      <div class="page-hd">
+    <div class="dist-view">
+      <div class="dist-view-hd" style="border-color:var(--bd2)">
         <div>
-          <div class="page-title">${c.label}</div>
-          <div class="page-sub" id="csub_${c.id}">${c.province.toUpperCase()} · LOADING…</div>
+          <div class="dv-title" style="color:var(--ink)">${c.label}</div>
+          <div class="dv-sub" id="dv_sub_${c.id}">${c.province} Province · Secondary City</div>
+        </div>
+        <div class="filter-pill" id="dv_pill_${c.id}">
+          <span id="dv_pill_lbl_${c.id}">—</span>
+          <span class="filter-pill-x" onclick="clearCityFilter('${c.id}')">✕</span>
         </div>
       </div>
 
-      <div class="context-notice">
-        <strong>Scope</strong> — This view covers only the <strong>urbanized sectors</strong> within ${c.label} district where 2025 satellite imagery was acquired.
-        Baseline = 2023 existing buildings in those sectors. New = 2025 new detections cross-referenced with building permits.
+      <div class="dv-kpis">
+        <div class="dkpi-cell" style="--kc:var(--sky)"><div class="dkpi-lbl">Total Buildings</div><div class="dkpi-val" id="dv_base_${c.id}" style="color:var(--sky)">—</div></div>
+        <div class="dkpi-cell" style="--kc:var(--teal)"><div class="dkpi-lbl">New 2025</div><div class="dkpi-val" id="dv_new_${c.id}" style="color:var(--teal)">—</div></div>
+        <div class="dkpi-cell" style="--kc:var(--rose)"><div class="dkpi-lbl">Without Permit</div><div class="dkpi-val" id="dv_ill_${c.id}" style="color:var(--rose)">—</div></div>
+        <div class="dkpi-cell" style="--kc:var(--lime)"><div class="dkpi-lbl">With Permit</div><div class="dkpi-val" id="dv_leg_${c.id}" style="color:var(--lime)">—</div></div>
+        <div class="dkpi-cell" style="--kc:var(--gold)"><div class="dkpi-lbl">Non-Compliance</div><div class="dkpi-val" id="dv_rate_${c.id}" style="color:var(--gold)">—</div></div>
       </div>
 
-      <div class="kpi-row">
-        <div class="kcard k-sky">
-          <div class="kcard-lbl">Baseline 2023</div>
-          <div class="kcard-val" style="color:var(--sky)" id="kBaseline_${c.id}">—</div>
-          <div class="kcard-sub">Existing in urbanized sectors</div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title"><span class="cdot"></span>Sectors — With vs Without Permit</div>
+          </div>
+          <div class="card-body scroll-box" id="dv_sec_${c.id}" style="display:flex;flex-direction:column;gap:2px;"></div>
         </div>
-        <div class="kcard k-teal">
-          <div class="kcard-lbl">New Detections 2025</div>
-          <div class="kcard-val" style="color:var(--teal)" id="kNew_${c.id}">—</div>
-          <div class="kcard-sub">New constructions found</div>
-        </div>
-        <div class="kcard k-rose">
-          <div class="kcard-lbl">Without Permit</div>
-          <div class="kcard-val" style="color:var(--rose)" id="kIll_${c.id}">—</div>
-          <div class="kcard-sub">Illegal new constructions</div>
-        </div>
-        <div class="kcard k-lime">
-          <div class="kcard-lbl">With Permit</div>
-          <div class="kcard-val" style="color:var(--lime)" id="kLeg_${c.id}">—</div>
-          <div class="kcard-sub">Compliant new builds</div>
-        </div>
-        <div class="kcard k-gold">
-          <div class="kcard-lbl">Non-Compliance Rate</div>
-          <div class="kcard-val" id="kRate_${c.id}">—</div>
-          <div class="kcard-sub">of 2025 new detections</div>
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title"><span class="cdot"></span>Land Use Type</div>
+            <div class="card-meta">New 2025 only</div>
+          </div>
+          <div class="card-body" id="dv_lu_${c.id}" style="display:flex;flex-direction:column;gap:2px;"></div>
         </div>
       </div>
 
-      <div class="sec-hd">
-        Urban Sector Change Detection — 2023 Baseline vs 2025 New Constructions
-        <span class="sec-hd-meta" id="secMeta_${c.id}"></span>
-      </div>
-      <div class="card mb24">
-        <div class="card-body" id="secChange_${c.id}">
-          <div style="font-family:var(--mono);font-size:9px;color:var(--ink3);">Loading…</div>
-        </div>
-      </div>
-
-      <div class="sec-hd">
-        ArcGIS Feature Map — Permit Status by Building
-        <span class="sec-hd-meta">Filters sync to map · click bars to filter · click features to inspect</span>
-      </div>
-      <div class="card mb24">
+      <div class="g1 card">
         <div class="card-hd">
-          <div class="card-title"><span class="card-title-dot"></span>${c.label} — Building Permit Status</div>
-          <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
-            <span class="map-key" style="cursor:pointer" onclick="filterMapByLegal('Existing')" title="Click to show only 2023 baseline">
-              <span class="map-swatch" style="background:var(--bg4)"></span>Existing 2023
-            </span>
-            <span class="map-key" style="cursor:pointer" onclick="filterMapByLegal('Illegal')" title="Click to show only illegal constructions">
-              <span class="map-swatch" style="background:var(--rose)"></span>Illegal
-            </span>
-            <span class="map-key" style="cursor:pointer" onclick="filterMapByLegal('Legal')" title="Click to show only legal constructions">
-              <span class="map-swatch" style="background:var(--teal)"></span>Legal
-            </span>
-            <button onclick="resetFilters()" style="padding:3px 10px;background:none;border:1px solid var(--bd2);color:var(--ink3);font-family:var(--mono);font-size:8px;letter-spacing:1px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='var(--rose)';this.style.color='var(--rose)'" onmouseout="this.style.borderColor='var(--bd2)';this.style.color='var(--ink3)'">
-              Reset Map
+          <div class="card-title"><span class="cdot"></span>${c.label} — Building Permit Status Map</div>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <span class="mkey"><span class="msw" style="background:var(--bg5)"></span>Total Buildings 2023</span>
+            <span class="mkey"><span class="msw" style="background:var(--rose)"></span>Without Permit</span>
+            <span class="mkey"><span class="msw" style="background:var(--teal)"></span>With Permit</span>
+          </div>
+        </div>
+        <div class="map-div" id="dv_map_${c.id}"></div>
+        <div class="map-foot"><span class="mhint" id="dv_maphint_${c.id}">Loading map…</span></div>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title"><span class="cdot"></span>By Cell</div>
+            <div class="card-meta" id="dv_celmeta_${c.id}">—</div>
+          </div>
+          <div class="card-body scroll-box" id="dv_cel_${c.id}" style="display:flex;flex-direction:column;gap:2px;"></div>
+        </div>
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title"><span class="cdot"></span>Top Villages — Without Permit</div>
+            <div class="card-meta" id="dv_vilmeta_${c.id}">—</div>
+          </div>
+          <div class="card-body scroll-box" id="dv_vil_${c.id}" style="display:flex;flex-direction:column;gap:2px;"></div>
+        </div>
+      </div>
+
+      <div class="g1 card">
+        <div class="card-hd">
+          <div class="card-title"><span class="cdot"></span>Data Export</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span class="card-meta" id="dv_dlcount_${c.id}">—</span>
+            <button class="btn-dl" onclick="downloadCSV('${c.id}')">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>CSV
             </button>
           </div>
         </div>
-        <div class="map-div" id="mapDiv_${c.id}"></div>
-        <div class="map-legend-bar">
-          <span class="map-hint" id="mhint_${c.id}">Map loading…</span>
-        </div>
-      </div>
-
-      <div class="sec-hd">
-        Zone Code Analysis — New Constructions vs Permit Status
-        <span class="sec-hd-meta" id="zoneMeta_${c.id}"></span>
-      </div>
-      <div class="card mb24">
-        <div style="overflow:auto;max-height:380px;">
-          <table class="zone-tbl" style="min-width:620px;">
-            <thead><tr>
-              <th style="text-align:left">Zone</th>
-              <th style="text-align:left">Type</th>
-              <th>Baseline</th>
-              <th>New 2025</th>
-              <th>Illegal</th>
-              <th>Legal</th>
-              <th style="text-align:left;padding-left:10px;">Rate</th>
-            </tr></thead>
-            <tbody id="zoneBody_${c.id}"></tbody>
+        <div class="dl-wrap">
+          <table class="dl-tbl">
+            <thead><tr><th>City</th><th>Sector</th><th>Cell</th><th>Village</th><th>UPI</th><th style="text-align:right">Total Buildings</th><th style="text-align:right">New 2025</th><th style="text-align:right">Without Permit</th><th style="text-align:right">With Permit</th><th style="text-align:right">Rate</th></tr></thead>
+            <tbody id="dv_dl_${c.id}"></tbody>
           </table>
         </div>
       </div>
 
-      <div class="sec-hd">Cells &amp; Villages — Illegal Constructions Breakdown</div>
-      <div class="g2 mb24">
-        <div class="card">
-          <div class="card-hd">
-            <div class="card-title"><span class="card-title-dot"></span>By Cell — Legal vs Illegal</div>
-            <div class="card-meta" id="cellMeta_${c.id}">—</div>
-          </div>
-          <div class="card-body scroll-box" id="cellBars_${c.id}"></div>
-        </div>
-        <div class="card">
-          <div class="card-hd">
-            <div class="card-title"><span class="card-title-dot" style="background:var(--rose);box-shadow:0 0 6px var(--rose)"></span>Top Villages — Illegal Constructions</div>
-            <div class="card-meta" id="vilMeta_${c.id}">—</div>
-          </div>
-          <div class="card-body scroll-box" id="vilBars_${c.id}"></div>
-        </div>
-      </div>
-
-      <div class="sec-hd">Land Use — New Construction by Gen LU Category</div>
-      <div class="card mb24">
-        <div class="card-hd">
-          <div class="card-title"><span class="card-title-dot" style="background:var(--gold);box-shadow:0 0 6px var(--gold)"></span>Legal vs Illegal  by Land Use</div>
-          <div class="card-meta">New 2025 detections only</div>
-        </div>
-        <div class="card-body" id="luBars_${c.id}"></div>
-      </div>
-
-      <div class="sec-hd">
-        Data Export — Zone-Level Summary
-        <span class="sec-hd-meta" id="dlCount_${c.id}"></span>
-      </div>
-      <div class="card mb24">
-        <div class="card-hd">
-          <div class="card-title"><span class="card-title-dot" style="background:var(--lime);box-shadow:0 0 6px var(--lime)"></span>Zone × Permit Status Summary</div>
-          <button class="dl-btn" onclick="downloadCSV('${c.id}')">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download CSV
-          </button>
-        </div>
-        <div class="dl-table-wrap">
-          <table class="dl-table">
-            <thead><tr>
-              <th>District</th><th>Sector</th><th>Cell</th><th>Village</th>
-              <th>Zone Code</th><th>Zone Type</th>
-              <th style="text-align:right">Baseline 2023</th>
-              <th style="text-align:right">New 2025</th>
-              <th style="text-align:right">Illegal</th>
-              <th style="text-align:right">Legal</th>
-              <th style="text-align:right">Rate %</th>
-            </tr></thead>
-            <tbody id="dlBody_${c.id}"></tbody>
-          </table>
-        </div>
-      </div>
-    `;
+    </div>`;
     container.appendChild(div);
   });
 }
 
-// ══════════════════════════════════════════════════════════════
-//  NAVIGATION
-// ══════════════════════════════════════════════════════════════
-function showTab(id){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  document.querySelectorAll('.city-view').forEach(v=>v.classList.remove('on'));
-  $(`tab_${id}`)?.classList.add('on');
-  $(`view_${id}`)?.classList.add('on');
-  currentCity=id;
-  if(id!=='all') initCityMap(id);
-  if(id!=='all'){ const d=D[id]; if(d?.loaded) populateFilterDropdowns({id},d); }
+// ══════════════════════════════════════════════════════
+//  NAVIGATION — THE CORE
+// ══════════════════════════════════════════════════════
+let currentView='overview';
+
+function onDistChange(id){
+  // Hide all views
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  // Show target
+  const target=$(`view_${id}`);if(target)target.classList.add('active');
+  // Scroll to top
+  window.scrollTo({top:0,behavior:'smooth'});
+  // Sync dropdown
+  $('distSelect').value=id;
+  // Update filter bar indicator
+  if(id==='overview'){
+    $('selDot').style.background='var(--ink4)';
+    $('viewDot').style.background='var(--ink4)';
+    $('viewName').textContent='Cities';
+    $('viewName').style.color='var(--ink)';
+    $('viewSub').textContent='Overview — 7 Secondary & Satellite Cities';
+    $('btnBack').classList.remove('show');
+    // Clear all city filters when returning to overview
+    CITIES.forEach(c=>{cityFilter[c.id]=null;});
+  } else {
+    const city=CITIES.find(c=>c.id===id);
+    $('selDot').style.background='var(--ink4)';
+    $('viewDot').style.background='var(--ink4)';
+    $('viewName').textContent=city.label;
+    $('viewName').style.color='var(--ink)';
+    $('viewSub').textContent=`${city.province} Province · Secondary City`;
+    $('btnBack').classList.add('show');
+    // Init map if not yet done
+    initCityMap(id);
+    // Fill data if loaded but not yet rendered (re-render is idempotent)
+    if(D[id].loaded)fillDistView(city);
+  }
+  currentView=id;
 }
 
-function setStatus(txt){
-  const b=$('sbar'); if(!b) return;
-  if(txt){ b.classList.remove('gone'); $('stxt').textContent=txt.toUpperCase(); }
-  else b.classList.add('gone');
-}
+function setStatus(txt){const b=$('sbar');if(!b)return;if(txt){b.classList.remove('gone');$('stxt').textContent=txt.toUpperCase();}else b.classList.add('gone');}
 
-// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 //  INIT
-// ══════════════════════════════════════════════════════════════
-buildTabs();
-buildCityViews();
-currentCity='all';
-renderAllView();
+// ══════════════════════════════════════════════════════
+buildDropdown();
+buildDistViews();
 
 Promise.all(CITIES.map(c=>loadCity(c))).then(()=>setStatus(null)).catch(()=>setStatus(null));
 </script>
